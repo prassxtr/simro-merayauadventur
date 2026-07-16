@@ -6,7 +6,7 @@
                 <h1 class="display-3 fw-bold text-white mb-4" style="line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
                     Jasa Persewaan Alat<br>
                     Outdoor Camping Merayau<br>
-                    Adventur
+                    Adventure
                 </h1>
                 <p class="lead text-white mb-5" style="font-size: 1.2rem; max-width: 700px; text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
                     Modern, higienis, dan terawat. Pilih perlengkapan petualangan Anda secara online, tentukan opsi jaminan, bayar DP, dan ambil di basecamp kami!
