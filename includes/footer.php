@@ -29,7 +29,9 @@
                     <i class="fas fa-map-marker-alt me-2"></i> Jl.Tanray 2 Gg.Nusa Abadi No. 22b
                 </p>
                 <p class="small text-secondary mb-0">
-                    <i class="fas fa-phone me-2"></i> +62 815 2296 9194
+                    <a href="https://wa.me/6281522969194" target="_blank" class="text-decoration-none text-secondary">
+                        <i class="fas fa-phone fa-fw me-2"></i> +62 815 2296 9194
+                    </a>
                 </p>
                 <p class="small text-secondary mb-0 mt-2">
                     <a href="https://instagram.com/merayauadventure" target="_blank" class="text-decoration-none text-secondary">
