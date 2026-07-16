@@ -38,7 +38,7 @@ $user_initial = strtoupper(substr($user_nama, 0, 1)); // Ambil huruf pertama unt
             <img src="<?= BASE_URL ?>assets/img/logo.png" alt="Logo SIMRO" style="height: 50px; width: auto; object-fit: contain;" class="me-3">
             <div class="d-flex flex-column justify-content-center" style="line-height: 1.1;">
                 <span class="fw-bold" style="font-size: 1.6rem; color: #8B0000; letter-spacing: 1px;">SIMRO</span>
-                <span class="fw-semibold" style="font-size: 0.75rem; color: #8B0000; letter-spacing: 2px; text-transform: uppercase;">MERAYAU ADVENTUR</span>
+                <span class="fw-semibold" style="font-size: 0.75rem; color: #8B0000; letter-spacing: 2px; text-transform: uppercase;">MERAYAU ADVENTURE</span>
             </div>
         </a>
         
