@@ -6,7 +6,7 @@ include 'includes/header.php';
 <section class="py-5" style="background: linear-gradient(135deg, #8B0000 0%, #6d0000 100%);">
     <div class="container text-center text-white">
         <h1 class="display-5 fw-bold mb-3">Tentang Kami</h1>
-        <p class="lead mb-0">Mengenal lebih dekat SIMRO Merayau Adventur, mitra petualangan Anda.</p>
+        <p class="lead mb-0">Mengenal lebih dekat SIMRO Merayau Adventure, mitra petualangan Anda.</p>
     </div>
 </section>
 
@@ -19,9 +19,9 @@ include 'includes/header.php';
             </div>
             <div class="col-lg-6">
                 <h5 class="text-danger fw-bold text-uppercase">Siapa Kami?</h5>
-                <h2 class="fw-bold mb-4">SIMRO Merayau Adventur</h2>
+                <h2 class="fw-bold mb-4">SIMRO Merayau Adventure</h2>
                 <p class="text-muted mb-4">
-                    SIMRO (Sistem Informasi Penyewaan Alat Outdoor) Merayau Adventur adalah penyedia jasa sewa peralatan camping dan pendakian yang berbasis di Pontianak, Kalimantan Barat. 
+                    SIMRO (Sistem Informasi Penyewaan Alat Outdoor) Merayau Adventure adalah penyedia jasa sewa peralatan camping dan pendakian yang berbasis di Pontianak, Kalimantan Barat. 
                 </p>
                 <p class="text-muted mb-4">
                     Kami hadir untuk memudahkan para pecinta alam dalam mendapatkan perlengkapan outdoor yang <strong>modern, higienis, dan terawat</strong> tanpa harus membeli dengan harga mahal. Dengan sistem pemesanan online, Anda bisa memilih alat, menentukan tanggal, dan mengambilnya langsung di basecamp kami dengan proses yang cepat dan transparan.
