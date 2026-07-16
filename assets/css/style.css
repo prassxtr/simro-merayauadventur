@@ -1,0 +1,241 @@
+/* =========================================
+   1. VARIABEL WARNA UTAMA
+   ========================================= */
+:root {
+    --primary-color: #8B0000;      /* Merah Marun (Sesuai Logo SIMRO) */
+    --primary-hover: #6d0000;      /* Merah Marun Gelap (untuk hover) */
+    --text-dark: #333333;
+}
+
+/* =========================================
+   2. NAVBAR & LOGO
+   ========================================= */
+.navbar-brand {
+    padding: 0;
+    text-decoration: none;
+}
+
+.navbar-brand:hover {
+    text-decoration: none;
+}
+
+.navbar-brand img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-nav .nav-link {
+    color: var(--text-dark);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+}
+
+/* =========================================
+   3. TOMBOL (BUTTONS)
+   ========================================= */
+.btn-danger {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-custom {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-custom:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* =========================================
+   4. HERO SECTION (Layar Penuh)
+   ========================================= */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 80px); /* Pas 1 layar dikurangi tinggi navbar */
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* =========================================
+   5. KARTU (CARDS) & FORM
+   ========================================= */
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none; /* Agar lebih clean */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.25);
+}
+
+/* =========================================
+   6. KERANJANG BELANJA
+   ========================================= */
+.navbar-nav .fa-shopping-cart {
+    color: var(--primary-color);
+}
+
+.badge.bg-danger {
+    background-color: var(--primary-color) !important;
+}
+
+/* =========================================
+   7. SPASI SECTION
+   ========================================= */
+.kategori-section,
+.aturan-section,
+section.py-5 {
+    padding: 80px 0 !important;
+}
+
+/* =========================================
+   8. RESPONSIVE DESIGN (Mobile & Tablet)
+   ========================================= */
+
+/* Reset Body */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Hero Section - Pas 1 Layar (dikurangi tinggi navbar 70px) */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+}
+
+/* Navbar sticky normal */
+.navbar {
+    min-height: 70px;
+}
+
+/* Section spacing */
+section.py-5 {
+    padding: 80px 0 !important;
+}
+
+/* Navbar styling */
+.navbar-nav .nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #8B0000;
+}
+
+.btn-danger {
+    background-color: #8B0000;
+    border-color: #8B0000;
+}
+
+.btn-danger:hover {
+    background-color: #6d0000;
+    border-color: #6d0000;
+}
+
+/* Card hover */
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        height: auto;
+        min-height: 500px;
+        padding: 100px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+}
+
+
+/* Dropdown Profile */
+.dropdown-menu {
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #fff5f5;
+    color: #8B0000;
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #fff5f5;
+    color: #6d0000;
+}
+
+.dropdown-divider {
+    margin: 5px 0;
+}
+
+/* Avatar Profile */
+.rounded-circle.bg-danger {
+    background-color: #8B0000 !important;
+}
+
+/* Navbar Toggle Mobile */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: white;
+        padding: 1rem;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        margin-top: 10px;
+    }
+    
+    .navbar-nav.mx-auto {
+        margin-bottom: 1rem;
+    }
+    
+    .dropdown-menu {
+        border: 1px solid #eee;
+    }
+}
