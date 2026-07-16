@@ -167,7 +167,7 @@ include 'includes/header.php';
                         <i class="fas fa-phone-alt text-danger fa-lg mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Telepon / WhatsApp</h6>
-                            <p class="text-muted small mb-0">+62 812-3456-7890</p>
+                            <p class="text-muted small mb-0">+62 815-2296-9194</p>
                         </div>
                     </div>
                     <div class="d-flex align-items-start mb-4">
@@ -181,7 +181,7 @@ include 'includes/header.php';
                         <i class="fas fa-clock text-danger fa-lg mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Jam Operasional</h6>
-                            <p class="text-muted small mb-0">Setiap Hari: 08.00 - 21.00 WIB</p>
+                            <p class="text-muted small mb-0">Setiap Hari: 08.00 - 23.30 WIB</p>
                         </div>
                     </div>
                 </div>
