@@ -15,7 +15,7 @@ if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-define('BASE_URL', 'http://localhost/simro-merayau-adventur/');
+define('BASE_URL', 'http://localhost/simro-merayauadventur/');
 
 function rupiah($angka) {
     return "Rp " . number_format($angka, 0, ',', '.');
