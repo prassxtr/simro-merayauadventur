@@ -10,9 +10,24 @@ require_once __DIR__ . '/../config/koneksi.php';
 // 3. Deteksi halaman aktif untuk styling menu
 $current_page = basename($_SERVER['PHP_SELF']);
 
-// 4. Ambil data user jika sudah login
-$user_nama = isset($_SESSION['nama']) ? $_SESSION['nama'] : '';
-$user_initial = strtoupper(substr($user_nama, 0, 1)); // Ambil huruf pertama untuk avatar
+// 4. Ambil data user lengkap jika sudah login
+$foto_profil = '';
+$user_initial = 'T'; // Default inisial
+
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $query = mysqli_query($koneksi, "SELECT foto_profil, nama_lengkap FROM users WHERE id = $user_id");
+    
+    if ($query && mysqli_num_rows($query) > 0) {
+        $user = mysqli_fetch_assoc($query);
+        $foto_profil = $user['foto_profil'] ?? '';
+        $user_nama = $user['nama_lengkap'] ?? $_SESSION['nama'];
+        $user_initial = strtoupper(substr($user_nama, 0, 1));
+    } else {
+        $user_nama = isset($_SESSION['nama']) ? $_SESSION['nama'] : '';
+        $user_initial = strtoupper(substr($user_nama, 0, 1));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -73,9 +88,16 @@ $user_initial = strtoupper(substr($user_nama, 0, 1)); // Ambil huruf pertama unt
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <!-- Avatar Bulat dengan Initial Nama -->
-                            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; font-weight: bold; font-size: 0.9rem;">
-                                <?= $user_initial ?>
-                            </div>
+                            <?php if (!empty($foto_profil)): ?>
+    <img src="<?= BASE_URL ?>uploads/<?= htmlspecialchars($foto_profil) ?>" 
+         class="rounded-circle me-2" 
+         style="width: 35px; height: 35px; object-fit: cover;" 
+         alt="Foto Profil">
+<?php else: ?>
+    <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; font-weight: bold; font-size: 0.9rem;">
+        <?= $user_initial ?>
+    </div>
+<?php endif; ?>
                             <span class="fw-semibold"><?= htmlspecialchars($user_nama) ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="profileDropdown">
