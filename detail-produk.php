@@ -38,10 +38,10 @@ $related_query = mysqli_query($koneksi, "SELECT * FROM produk WHERE kategori_id 
             <!-- Left: Image -->
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
-                    <img src="assets/img/produk/<?= htmlspecialchars($produk['gambar']) ?>" 
-                        class="card-img-top" 
-                        style="height: 500px; object-fit: cover;" 
-                         alt="<?= htmlspecialchars($produk['nama_produk']) ?>">
+                    <img src="assets/img/katalog/<?= htmlspecialchars($produk['gambar']) ?>" 
+                        class="card-img-top h-100" 
+                        style="object-fit: cover;" 
+                        alt="<?= htmlspecialchars($produk['nama_produk']) ?>">
                 </div>
             </div>
             
