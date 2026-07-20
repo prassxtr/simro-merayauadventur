@@ -30,7 +30,7 @@ function tanggal_indo($tanggal) {
     return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
 }
 
-function buat_kode_pesanan() {
+function buat_kode_pesanan() { 
     $kode = 'MRW-' . date('Ymd') . '-';
     $query = mysqli_query($GLOBALS['koneksi'], "SELECT nomor_pesanan FROM penyewaan WHERE nomor_pesanan LIKE '$kode%' ORDER BY nomor_pesanan DESC LIMIT 1");
     $data = mysqli_fetch_assoc($query);
