@@ -102,10 +102,10 @@ $produk_query = mysqli_query($koneksi, $query);
                 <div class="col-md-6 col-lg-4">
                     <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; overflow: hidden;">
                         <div style="height: 250px; overflow: hidden; background: #f8f9fa;">
-                            <img src="assets/img/produk/<?= htmlspecialchars($produk['gambar']) ?>" 
-                                 class="card-img-top h-100" 
-                                 style="object-fit: cover;" 
-                                 alt="<?= htmlspecialchars($produk['nama_produk']) ?>">
+                            <img src="assets/img/katalog/<?= htmlspecialchars($produk['gambar']) ?>" 
+                                class="card-img-top h-100" 
+                                style="object-fit: cover;" 
+                                alt="<?= htmlspecialchars($produk['nama_produk']) ?>">
                         </div>
                         <div class="card-body p-4">
                             <h6 class="fw-bold mb-2"><?= htmlspecialchars($produk['nama_produk']) ?></h6>
