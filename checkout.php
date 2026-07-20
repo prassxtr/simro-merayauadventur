@@ -2,6 +2,11 @@
 ob_start();
 include 'includes/header.php'; 
 
+// Cek koneksi database (Sesuaikan dengan variabel koneksi kamu, di sini saya siapkan cadangan ke $conn)
+if (!isset($koneksi) && isset($conn)) {
+    $koneksi = $conn;
+}
+
 if (!isset($_SESSION['user_id']) || empty($_SESSION['keranjang'])) {
     header('Location: keranjang.php');
     exit;
@@ -23,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bukti_pembayaran']))
     $tgl_sewa = $_SESSION['keranjang'][0]['tgl_mulai'];
     $tgl_kembali = $_SESSION['keranjang'][0]['tgl_kembali'];
     
-    // Upload file
-    $upload_dir = 'assets/uploads/bukti_pembayaran/';
+    // UBAHAN DISINI: Folder upload disesuaikan dengan folder yang dibaca oleh admin
+    $upload_dir = 'assets/img/bukti/';
     if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
@@ -45,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bukti_pembayaran']))
     } elseif ($file['error'] !== UPLOAD_ERR_OK) {
         $error = "Terjadi kesalahan saat upload file.";
     } else {
-        // Pindahkan file
+        // Pindahkan file ke folder aset gambar
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
             // Insert ke database
             $query_sewa = "INSERT INTO penyewaan (user_id, nomor_pesanan, tanggal_sewa, tanggal_kembali, total_harga, status_pembayaran, status_sewa, bukti_pembayaran) 
@@ -70,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bukti_pembayaran']))
                 $error = "Gagal menyimpan pesanan: " . mysqli_error($koneksi);
             }
         } else {
-            $error = "Gagal mengupload file. Silakan coba lagi.";
+            $error = "Gagal mengupload file ke folder tujuan. Pastikan folder 'assets/img/bukti/' dapat ditulis.";
         }
     }
 }
