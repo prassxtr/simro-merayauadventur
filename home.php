@@ -4,10 +4,10 @@
         <div class="row">
             <div class="col-lg-10">
                 <h1 class="display-3 fw-bold text-white mb-4" style="line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
-                    Jasa Persewaan Alat<br>
-                    Outdoor Camping Merayau<br>
-                    Adventure
-                </h1>
+                    Jasa Penyewaan Alat<br>
+                    Outdoor Camping <br>
+                    Merayau Adventure 
+                </h1> 
                 <p class="lead text-white mb-5" style="font-size: 1.2rem; max-width: 700px; text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
                     Modern, higienis, dan terawat. Pilih perlengkapan petualangan Anda secara online, tentukan opsi jaminan, bayar DP, dan ambil di basecamp kami!
                 </p>
@@ -61,7 +61,7 @@
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="fw-bold">Aturan Sewa</h2>
-            <p class="text-muted">Ingat Wajib patuhi aturan sewa ini</p>
+            <p class="text-muted">Ingat wajib patuhi aturan sewa ini</p>
         </div>
         
         <div class="row g-4">
