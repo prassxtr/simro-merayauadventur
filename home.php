@@ -57,6 +57,7 @@
 </section>
 
 <!-- Aturan Sewa Section -->
+<!-- Aturan Sewa Section -->
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
@@ -65,99 +66,123 @@
         </div>
         
         <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100" style="background: #fff5f5;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="fw-bold text-danger mb-0">WAKTU SEWA</h5>
-                            <span class="badge bg-danger px-3 py-2">DISKON 30%</span>
+            <!-- Waktu Sewa Box (Kiri - Besar) -->
+            <div class="col-lg-6">
+                <div class="card border-0 h-100" style="background: #FFF0F0; border-radius: 15px;">
+                    <div class="card-body p-4 position-relative">
+                        <!-- Badge Diskon -->
+                        <div class="position-absolute top-0 end-0 mt-3 me-3">
+                            <div style="background: #8B0000; color: white; padding: 15px 10px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%); text-align: center; min-width: 70px;">
+                                <div style="font-size: 0.65rem; text-transform: uppercase; margin-bottom: 2px;">DISKON</div>
+                                <div style="font-size: 1.4rem; font-weight: bold; line-height: 1;">30%</div>
+                            </div>
                         </div>
-                        <p class="text-muted small mb-0">
-                            Maksimal penyewaan dihitung per hari (24 jam). Toleransi waktu pengembalian hanya diberikan 4 jam. Keterlambatan pengembalian akan dikenakan biaya tambahan sesuai tarif sewa per hari. Dan diskon 30% untuk penyewaan lebih dari 7 hari.
-                        </p>
+                        
+                        <h5 class="fw-bold mb-3" style="color: #8B0000;">WAKTU SEWA</h5>
+                        <ul class="list-unstyled mb-0" style="font-size: 0.9rem; color: #666;">
+                            <li class="mb-3">
+                                Maksimal penyewaan dihitung per hari (24 jam). Toleransi waktu pengembalian hanya diberikan 4 jam. Keterlambatan pengembalian akan dikenakan biaya tambahan sesuai tarif sewa per hari.
+                            </li>
+                            <li>
+                                Dan diskon 30% untuk penyewaan lebih dari 7 hari.
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-6">
-                <div class="d-flex align-items-start mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-sync-alt text-danger"></i>
+            <!-- Rules List (Kanan) -->
+            <div class="col-lg-6">
+                <!-- Pengembalian Peralatan -->
+                <div class="d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px dashed #ddd;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-upload" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">PENGEMBALIAN PERALATAN</h6>
-                        <p class="text-muted small mb-0">Penyewa wajib memeriksa kondisi barang saat pengambilan. setelah barang dibawa, dianggap sudah sesuai dan lengkap.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">PENGEMBALIAN PERALATAN</h6>
+                        <p class="text-muted mb-0 small">Penyewa wajib memeriksa kondisi barang saat pengambilan. setelah barang dibawa, dianggap sudah sesuai dan lengkap.</p>
                     </div>
                 </div>
                 
-                <div class="d-flex align-items-start mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                <!-- Kerusakan atau Kehilangan -->
+                <div class="d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px dashed #ddd;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-exclamation-triangle" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">KERUSAKAN ATAU KEHILANGAN</h6>
-                        <p class="text-muted small mb-0">Penyewa bertanggung jawab atas kerusakan atau kehilangan barang selama masa sewa. Biaya ganti rugi disesuaikan dengan biaya perbaikan atau harga barang-barang.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">KERUSAKAN ATAU KEHILANGAN</h6>
+                        <p class="text-muted mb-0 small">Penyewa bertanggung jawab atas kerusakan atau kehilangan barang selama masa sewa. Biaya ganti rugi disesuaikan dengan biaya perbaikan atau harga barang-barang.</p>
                     </div>
                 </div>
                 
-                <div class="d-flex align-items-start mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-shield-alt text-danger"></i>
+                <!-- Jaminan -->
+                <div class="d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px dashed #ddd;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-shield-alt" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">JAMINAN</h6>
-                        <p class="text-muted small mb-0">Penyewa harus memberikan jaminan identitas asli (KTP/SIM/KTM) selama masa sewa. Identitas akan dikembalikan setelah alat dikembalikan.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">JAMINAN</h6>
+                        <p class="text-muted mb-0 small">Penyewa harus memberikan jaminan identitas asli (KTP/SIM/KTM) selama masa sewa. Identitas akan dikembalikan setelah alat dikembalikan.</p>
                     </div>
                 </div>
                 
-                <div class="d-flex align-items-start mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-cog text-danger"></i>
+                <!-- Penggunaan Peralatan -->
+                <div class="d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px dashed #ddd;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-cog" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">PENGGUNAAN PERALATAN</h6>
-                        <p class="text-muted small mb-0">Gunakan peralatan sesuai fungsi. Dilarang menggunakan peralatan untuk aktivitas yang dapat merusak atau membahayakan alat.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">PENGGUNAAN PERALATAN</h6>
+                        <p class="text-muted mb-0 small">Gunakan peralatan sesuai fungsi. Dilarang menggunakan peralatan untuk aktivitas yang dapat merusak atau membahayakan alat.</p>
                     </div>
                 </div>
                 
+                <!-- Pengambilan Peralatan -->
                 <div class="d-flex align-items-start mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-search text-danger"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-search" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">PENGAMBILAN PERALATAN</h6>
-                        <p class="text-muted small mb-0">Penyewa wajib memeriksa kondisi barang saat pengambilan. Setelah barang dibawa, dianggap sudah sesuai dan lengkap.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">PENGAMBILAN PERALATAN</h6>
+                        <p class="text-muted mb-0 small">Penyewa wajib memeriksa kondisi barang saat pengambilan. Setelah barang dibawa, dianggap sudah sesuai dan lengkap.</p>
                     </div>
                 </div>
                 
+                <!-- Pembatalan -->
                 <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <div class="bg-light rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-times-circle text-danger"></i>
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #FFF5F5;">
+                            <i class="fas fa-exclamation-triangle" style="color: #8B0000; font-size: 1.2rem;"></i>
                         </div>
                     </div>
-                    <div class="ms-3">
-                        <h6 class="fw-bold text-danger mb-1">PEMBATALAN</h6>
-                        <p class="text-muted small mb-0">Pembatan mendadak dapat menyebabkan DP tidak dapat di kembalikan.</p>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #8B0000;">PEMBATALAN</h6>
+                        <p class="text-muted mb-0 small">Pembatalan mendadak dapat menyebabkan DP tidak dapat dikembalikan.</p>
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Bottom Banner -->
         <div class="row mt-5">
             <div class="col-12">
-                <div class="alert alert-danger text-center mb-0" role="alert">
-                    <i class="fas fa-info-circle me-2"></i> Dengan melakukan penyewaan, penyewa dianggap telah membaca dan menyetujui semua aturan di atas.
+                <div class="card border-0 text-center" style="background: linear-gradient(135deg, #8B0000 0%, #6d0000 100%); border-radius: 10px;">
+                    <div class="card-body py-3 px-4">
+                        <p class="text-white mb-0 small">
+                            <i class="fas fa-handshake me-2"></i>
+                            <strong>Dengan melakukan penyewaan, penyewa dianggap telah membaca dan menyetujui semua aturan di atas.</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
