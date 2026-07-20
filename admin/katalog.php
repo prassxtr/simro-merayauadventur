@@ -133,7 +133,7 @@ while($k = mysqli_fetch_assoc($list_kategori)) {
         .btn-maroon:hover { background-color: #770000; color: white; }
         .table-container { background: #f0f4fa; border: 2px solid #990000; border-radius: 16px; padding: 20px; }
         .product-img { width: 55px; height: 55px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
-        .badge-ready { background-color: #ffe8cc; color: #e67e22; font-weight: 600; }
+        .badge-ready { background-color: #770000; color: #b64949; font-weight: 600; }
         .text-maroon { color: #990000; font-weight: 700; }
     </style>
 </head>
@@ -166,7 +166,7 @@ while($k = mysqli_fetch_assoc($list_kategori)) {
                     <?php } ?>
                 </select>
             </form>
-            <button class="btn btn-maroon px-4" data-bs-toggle="modal" data-bs-target="#modalTambah"><i class="fas fa-plus me-2"></i> Tambah Alat</button>
+            <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#modalTambah"><i class="fas fa-plus me-2"></i> Tambah Alat</button>
         </div>
 
         <!-- Tabel Data -->
@@ -200,8 +200,8 @@ while($k = mysqli_fetch_assoc($list_kategori)) {
                         <td><small class="text-muted"><?php echo substr($row['deskripsi'], 0, 60); ?>...</small></td>
                         <td class="text-center fw-bold"><span class="badge badge-ready px-3 py-2 rounded-pill"><?php echo $row['stok']; ?> Unit</span></td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-link text-muted me-2" data-bs-toggle="modal" data-bs-target="#modalEdit<?php echo $row['id']; ?>"><i class="fas fa-pencil-alt fs-5"></i></button>
-                            <button class="btn btn-sm btn-link text-muted" data-bs-toggle="modal" data-bs-target="#modalHapus<?php echo $row['id']; ?>"><i class="fas fa-trash-alt fs-5"></i></button>
+                            <button class="btn btn-sm btn-link text-muted me-2" data-bs-toggle="modal" data-bs-target="#modalEdit<?php echo $row['id']; ?>"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-sm btn-link text-muted" data-bs-toggle="modal" data-bs-target="#modalHapus<?php echo $row['id']; ?>"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
 
