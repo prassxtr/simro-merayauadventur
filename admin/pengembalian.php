@@ -8,11 +8,12 @@ $search = '';
 $filter_status = '';
 
 // ==========================================
-// LOGIKA PROSES PENGEMBALIAN
+// LOGIKA PROSES PENGEMBALIAN (SUDAH DIPERBAIKI TOTAL)
 // ==========================================
 if (isset($_POST['proses_kembali'])) {
     $penyewaan_id = (int)$_POST['penyewaan_id'];
-    $maintenance_items = isset($_POST['maintenance_items']) ? $_POST['maintenance_items'] : [];
+    $kondisi_barang = $_POST['kondisi_barang'] ?? []; 
+    $keterangan_rusak = $_POST['keterangan_rusak'] ?? []; 
     
     mysqli_begin_transaction($conn);
     
@@ -26,14 +27,27 @@ if (isset($_POST['proses_kembali'])) {
         while($item = mysqli_fetch_assoc($result_detail)) {
             $produk_id = $item['produk_id'];
             $jumlah = $item['jumlah'];
+            $kondisi = $kondisi_barang[$produk_id] ?? 'baik';
             
-            if(in_array($produk_id, $maintenance_items)) {
-                mysqli_query($conn, "UPDATE produk SET status = 'maintenance' WHERE id = $produk_id");
-            } else {
+            if ($kondisi == 'baik') {
+                // 1. Kembali normal: Stok bertambah
                 mysqli_query($conn, "UPDATE produk SET stok = stok + $jumlah, status = 'tersedia' WHERE id = $produk_id");
+                
+            } elseif ($kondisi == 'cuci') {
+                // 2. Cuci/Maintenance: Stok TIDAK bertambah, masuk log maintenance (dengan jumlah)
+                mysqli_query($conn, "UPDATE produk SET status = 'maintenance' WHERE id = $produk_id");
+                mysqli_query($conn, "INSERT INTO maintenance_log (produk_id, jumlah, tanggal_mulai, keterangan, biaya, status) 
+                                    VALUES ($produk_id, $jumlah, NOW(), 'Cuci setelah penyewaan', 0, 'dalam_perbaikan')");
+                
+            } elseif ($kondisi == 'rusak' || $kondisi == 'hilang') {
+                // 3. Rusak/Hilang: Stok TIDAK bertambah (permanen hilang), masuk log kerusakan
+                $ket = mysqli_real_escape_string($conn, $keterangan_rusak[$produk_id] ?? 'Tidak ada keterangan');
+                mysqli_query($conn, "INSERT INTO log_kerusakan (penyewaan_id, produk_id, jumlah, jenis, keterangan, tanggal) 
+                                    VALUES ($penyewaan_id, $produk_id, $jumlah, '$kondisi', '$ket', NOW())");
             }
         }
         
+        // Update status penyewaan menjadi selesai
         mysqli_query($conn, "UPDATE penyewaan SET status_sewa = 'selesai' WHERE id = $penyewaan_id");
         
         mysqli_commit($conn);
@@ -46,6 +60,9 @@ if (isset($_POST['proses_kembali'])) {
     }
 }
 
+// ==========================================
+// PENCARIAN & FILTER
+// ==========================================
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 $filter_status = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : '';
 
@@ -92,6 +109,9 @@ $result = mysqli_query($conn, $query_tampil);
         .badge-lunas { background-color: #198754; color: white; }
         .badge-pending { background-color: #ffc107; color: #000; }
         
+        .kondisi-select { font-size: 0.85rem; padding: 0.3rem; }
+        .keterangan-box { display: none; margin-top: 0.5rem; }
+        
         @media (max-width: 991px) {
             .main-content { margin-left: 0; padding: 1rem; }
         }
@@ -102,7 +122,6 @@ $result = mysqli_query($conn, $query_tampil);
     <?php include('include/sidebar.php'); ?>
 
     <div class="main-content">
-        
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0 text-dark">
                 <i class="fas fa-clipboard-check me-2 text-maroon"></i>Kelola Pengembalian
@@ -189,7 +208,7 @@ $result = mysqli_query($conn, $query_tampil);
                                     <td class="text-center">
                                         <?php if(in_array($row['status_sewa'], ['diproses', 'disewa'])): ?>
                                             <button class="btn btn-sm btn-maroon" 
-                                                    onclick="openModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['nomor_pesanan']); ?>', '<?php echo htmlspecialchars($row['nama_lengkap']); ?>', <?php echo $row['total_harga']; ?>)">
+                                                    onclick="openModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['nomor_pesanan']); ?>', '<?php echo htmlspecialchars($row['nama_lengkap']); ?>')">
                                                 <i class="fas fa-undo me-1"></i> Proses Kembali
                                             </button>
                                         <?php else: ?>
@@ -213,7 +232,7 @@ $result = mysqli_query($conn, $query_tampil);
         </div>
     </div>
 
-    <!-- MODAL UNIVERSAL -->
+    <!-- MODAL UNIVERSAL PENGEMBALIAN -->
     <div class="modal fade" id="modalPengembalian" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -231,7 +250,7 @@ $result = mysqli_query($conn, $query_tampil);
                             <span id="modal_nama_penyewa"></span>
                         </div>
                         
-                        <h6 class="fw-bold mb-3">Daftar Barang yang Dikembalikan:</h6>
+                        <h6 class="fw-bold mb-3">Tentukan Kondisi Setiap Barang:</h6>
                         
                         <div class="table-responsive">
                             <table class="table table-bordered" id="tabel_barang">
@@ -239,10 +258,7 @@ $result = mysqli_query($conn, $query_tampil);
                                     <tr>
                                         <th>Barang</th>
                                         <th class="text-center">Jumlah</th>
-                                        <th class="text-center">Harga/Hari</th>
-                                        <th class="text-center">
-                                            <i class="fas fa-tools me-1"></i>Maintenance?
-                                        </th>
+                                        <th class="text-center">Kondisi Pulang</th>
                                     </tr>
                                 </thead>
                                 <tbody id="list_barang">
@@ -251,12 +267,13 @@ $result = mysqli_query($conn, $query_tampil);
                             </table>
                         </div>
                         
-                        <div class="alert alert-warning mb-0">
+                        <div class="alert alert-warning mb-0 small">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Keterangan:</strong>
-                            <ul class="mb-0 mt-2 small">
-                                <li>Barang yang <strong>TIDAK</strong> dicentang → stok otomatis bertambah.</li>
-                                <li>Barang yang <strong>dicentang</strong> → masuk status maintenance.</li>
+                            <strong>Keterangan Logika:</strong>
+                            <ul class="mb-0 mt-1">
+                                <li><strong>Baik:</strong> Stok otomatis bertambah.</li>
+                                <li><strong>Cuci:</strong> Stok belum bertambah, masuk antrean Maintenance.</li>
+                                <li><strong>Rusak/Hilang:</strong> Stok <u>permanen tidak bertambah</u> (hilang dari inventaris) & wajib diisi keterangan.</li>
                             </ul>
                         </div>
                     </div>
@@ -274,52 +291,38 @@ $result = mysqli_query($conn, $query_tampil);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function openModal(id, nomor, nama, total) {
+        function openModal(id, nomor, nama) {
             document.getElementById('modal_penyewaan_id').value = id;
             document.getElementById('modal_nomor_pesanan').textContent = nomor;
             document.getElementById('modal_nama_penyewa').textContent = nama;
             
-            // Fetch data barang via AJAX
             fetch('get_detail_penyewaan.php?id=' + id)
                 .then(response => response.json())
                 .then(data => {
                     let html = '';
-                    let totalItems = 0;
                     
                     data.forEach(item => {
-                        totalItems++;
                         html += `
                             <tr>
                                 <td>
                                     <div class="fw-bold">${item.nama_produk}</div>
-                                    <small class="text-muted">Stok saat ini: ${item.stok} unit</small>
+                                    <small class="text-muted">Stok sistem: ${item.stok} unit</small>
                                 </td>
-                                <td class="text-center fw-bold">${item.jumlah}</td>
-                                <td class="text-center">Rp ${parseInt(item.harga_sewa).toLocaleString('id-ID')}</td>
-                                <td class="text-center">
-                                    <div class="form-check form-switch d-flex justify-content-center">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               name="maintenance_items[]" 
-                                               value="${item.produk_id}" 
-                                               id="maint_${item.produk_id}"
-                                               style="transform: scale(1.3);">
-                                    </div>
-                                    <small class="text-danger d-block mt-1">
-                                        <i class="fas fa-wrench me-1"></i>Centang jika rusak
-                                    </small>
+                                <td class="text-center fw-bold align-middle">${item.jumlah}</td>
+                                <td style="min-width: 250px;">
+                                    <select name="kondisi_barang[${item.produk_id}]" class="form-select kondisi-select" onchange="toggleKeterangan(this, ${item.produk_id})">
+                                        <option value="baik">✅ Baik (Stok Bertambah)</option>
+                                        <option value="cuci">🧼 Cuci / Maintenance (Stok Ditahan)</option>
+                                        <option value="rusak">❌ Rusak (Stok Permanen Berkurang)</option>
+                                        <option value="hilang">🚫 Hilang (Stok Permanen Berkurang)</option>
+                                    </select>
+                                    <textarea name="keterangan_rusak[${item.produk_id}]" id="ket_${item.produk_id}" class="form-control keterangan-box mt-2" rows="2" placeholder="Jelaskan detail kerusakan / kronologi kehilangan..."></textarea>
                                 </td>
                             </tr>
                         `;
                     });
                     
                     document.getElementById('list_barang').innerHTML = html;
-                    
-                    // Update tombol submit
-                    const submitBtn = document.querySelector('#modalPengembalian button[type="submit"]');
-                    submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Proses Pengembalian (${totalItems} Barang)`;
-                    
-                    // Show modal
                     const modal = new bootstrap.Modal(document.getElementById('modalPengembalian'));
                     modal.show();
                 })
@@ -327,6 +330,19 @@ $result = mysqli_query($conn, $query_tampil);
                     console.error('Error:', error);
                     alert('Gagal mengambil data barang');
                 });
+        }
+
+        // FUNGSI INI SUDAH DIPERBAIKI (Typo 'each' diganti menjadi '}')
+        function toggleKeterangan(selectElement, produkId) {
+            const ketBox = document.getElementById('ket_' + produkId);
+            if (selectElement.value === 'rusak' || selectElement.value === 'hilang') {
+                ketBox.style.display = 'block';
+                ketBox.required = true; // Wajib diisi jika rusak/hilang
+            } else {
+                ketBox.style.display = 'none';
+                ketBox.required = false;
+                ketBox.value = ''; // Reset nilai
+            }
         }
     </script>
 </body>
