@@ -47,7 +47,20 @@ $produk_query = mysqli_query($koneksi, $query);
             <p class="text-muted mb-4">Stok sinkron otomatis dengan sistem pusat (SIMRO)</p>
         </div>
         
-        <div class="row g-4 mb-5">
+        <!-- UBAHAN: row dengan gap lebih kecil (g-2) dan class khusus row-7-kategori -->
+        <div class="row g-2 g-md-3 mb-5 row-7-kategori">
+            
+            <!-- OPSI LIHAT SEMUA -->
+            <div class="col-4 col-md-2 col-kategori-7">
+                <a href="katalog.php" class="text-decoration-none text-center d-block">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" 
+                         style="width: 60px; height: 60px; background: #c9a9a9; transition: all 0.3s;">
+                        <i class="fas fa-ellipsis-h text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <small class="text-dark fw-semibold">Lihat Semua</small>
+                </a>
+            </div>
+
             <?php 
             // Reset pointer kategori untuk ditampilkan
             mysqli_data_seek($kategori_query, 0);
@@ -63,11 +76,11 @@ $produk_query = mysqli_query($koneksi, $query);
                 ];
                 $icon = $icons[$kat['id']] ?? 'fa-box';
             ?>
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-4 col-md-2 col-kategori-7">
                 <a href="?kategori=<?= $kat['id'] ?>" class="text-decoration-none text-center d-block <?= $kategori_id == $kat['id'] ? 'active' : '' ?>">
                     <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 <?= $kategori_id == $kat['id'] ? 'bg-danger' : '' ?>" 
-                         style="width: 70px; height: 70px; background: #c9a9a9; transition: all 0.3s;">
-                        <i class="fas <?= $icon ?> text-white" style="font-size: 1.8rem;"></i>
+                         style="width: 60px; height: 60px; background: #c9a9a9; transition: all 0.3s;">
+                        <i class="fas <?= $icon ?> text-white" style="font-size: 1.5rem;"></i>
                     </div>
                     <small class="text-dark fw-semibold"><?= htmlspecialchars($kat['nama_kategori']) ?></small>
                 </a>
@@ -159,6 +172,15 @@ document.querySelectorAll('.kategori-filter a').forEach(link => {
 </script>
 
 <style>
+/* --- CUSTOM CSS UNTUK 7 ITEM DALAM 1 BARIS --- */
+/* Pada layar desktop (lg ke atas), paksa setiap item mengambil tepat 1/7 dari lebar (14.2857%) */
+@media (min-width: 992px) {
+    .row-7-kategori .col-kategori-7 {
+        flex: 0 0 14.2857% !important;
+        max-width: 14.2857% !important;
+    }
+}
+
 /* Custom styles untuk katalog */
 .rounded-circle {
     transition: all 0.3s ease;
