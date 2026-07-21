@@ -7,75 +7,88 @@
         width: 280px; 
         height: 100vh; 
         position: fixed; 
-        background-color: #f0f4fa; /* Warna background putih kebiruan pucat */
-        border-right: 1px solid #dcdcdc;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        z-index: 1000;
     }
     .brand-title {
-        color: #990000; /* Warna merah marun khas SIMRO */
+        color: #990000;
         font-weight: 800;
-        font-size: 1.5rem;
-        line-height: 1.1;
+        font-size: 1.4rem;
+        line-height: 1.2;
         letter-spacing: 0.5px;
     }
     .brand-subtitle {
         color: #990000;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .custom-hr {
         border-top: 2px solid #990000;
         opacity: 1;
-        margin-top: 15px;
-        margin-bottom: 25px;
+        margin: 20px 0;
     }
     .custom-hr-bottom {
-        border-top: 2px solid #990000;
+        border-top: 1px solid #dee2e6;
         opacity: 1;
-        margin-bottom: 15px;
+        margin: 15px 0;
     }
     .nav-custom .nav-link {
-        color: #000000 !important; /* Teks menu warna hitam */
+        color: #2c3e50 !important;
         font-weight: 600;
         padding: 12px 16px;
-        border-radius: 10px;
-        margin-bottom: 10px;
+        border-radius: 8px;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+    }
+    .nav-custom .nav-link:hover {
+        background-color: #e9ecef;
+        color: #990000 !important;
     }
     .nav-custom .nav-link i {
-        font-size: 1.2rem;
-        width: 30px;
+        font-size: 1.1rem;
+        width: 28px;
+        margin-right: 12px;
     }
-    /* Style menu ketika aktif (Persis seperti Kelola Pengembalian di gambar) */
     .nav-custom .nav-link.active {
-        background-color: #990000 !important; /* Kotak merah marun */
-        color: #ffffff !important; /* Teks putih */
+        background-color: #990000 !important;
+        color: #ffffff !important;
+    }
+    .nav-custom .nav-link.active i {
+        color: #ffffff !important;
     }
     .logout-section {
-        padding-top: 15px;
+        padding-top: 10px;
     }
     .logout-link {
-        color: #000000 !important;
+        color: #2c3e50 !important;
         font-weight: 600;
         text-decoration: none;
         display: flex;
         align-items: center;
         padding: 10px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .logout-link:hover {
+        background-color: #e9ecef;
+        color: #990000 !important;
     }
     .logout-link i {
-        font-size: 1.3rem;
-        margin-right: 10px;
+        font-size: 1.2rem;
+        margin-right: 12px;
     }
 </style>
 
-<div class="d-flex flex-column flex-shrink-0 p-3 custom-sidebar justify-content-between">
+<div class="d-flex flex-column flex-shrink-0 p-3 custom-sidebar">
     <div>
         <!-- Bagian Logo & Judul Atas -->
-        <div class="d-flex align-items-center px-2 pt-2">
-            <!-- SILAKAN GANTI 'assets/logo.png' DENGAN PATH LOGO ANDA -->
-            <img src="assets/logo.png" alt="Logo SIMRO" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
+        <div class="d-flex align-items-center px-2 pt-2 pb-3">
+            <img src="../assets/img/logo.png" alt="Logo SIMRO" class="rounded-circle me-3" style="width: 55px; height: 55px; object-fit: cover; border: 2px solid #990000;">
             <div>
                 <div class="brand-title">SIMRO</div>
                 <div class="brand-subtitle">Merayau Adventure</div>
@@ -85,47 +98,46 @@
         <hr class="custom-hr">
         
         <!-- Daftar Menu -->
-        <ul class="nav nav-pills flex-column nav-custom">
+        <ul class="nav nav-pills flex-column nav-custom mb-4">
             <li class="nav-item">
                 <a href="katalog.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'katalog.php') ? 'active' : ''; ?>">
-                    <i class="fa-solid fa-grid-2x2 me-2"><!-- Icon Grid/Kotak -->
-                        <span class="d-inline-block" style="border: 2px solid currentColor; width: 7px; height: 7px; margin: 1px;"></span>
-                        <span class="d-inline-block" style="border: 2px solid currentColor; width: 7px; height: 7px; margin: 1px;"></span><br>
-                        <span class="d-inline-block" style="border: 2px solid currentColor; width: 7px; height: 7px; margin: 1px;"></span>
-                        <span class="d-inline-block" style="border: 2px solid currentColor; width: 7px; height: 7px; margin: 1px;"></span>
-                    </i> 
-                    Kelola Katalog
+                    <i class="fa-solid fa-layer-group"></i> 
+                    <span>Kelola Katalog</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
                 <a href="penyewaan.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'penyewaan.php') ? 'active' : ''; ?>">
-                    <i class="fa-solid fa-cart-shopping me-2"></i> Kelola Penyewaan
+                    <i class="fa-solid fa-cart-shopping"></i> 
+                    <span>Kelola Penyewaan</span>
                 </a>
             </li>
-            <li>
-                <!-- Di gambar ini yang sedang aktif, otomatis akan berwarna merah marun jika file-nya pengembalian.php -->
+            <li class="nav-item">
                 <a href="pengembalian.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'pengembalian.php' || basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">
-                    <i class="fa-solid fa-box-archive me-2"></i> Kelola Pengembalian
+                    <i class="fa-solid fa-clipboard-check"></i> 
+                    <span>Kelola Pengembalian</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
                 <a href="pelanggan.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'pelanggan.php') ? 'active' : ''; ?>">
-                    <i class="fa-regular fa-user me-2"></i> Kelola pelanggan
+                    <i class="fa-solid fa-users"></i> 
+                    <span>Kelola Pelanggan</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
                 <a href="maintenance.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'maintenance.php') ? 'active' : ''; ?>">
-                    <i class="fa-solid fa-gear me-2"></i> Manitenance
+                    <i class="fa-solid fa-screwdriver-wrench"></i> 
+                    <span>Maintenance</span>
                 </a>
             </li>
         </ul>
     </div>
 
     <!-- Bagian Tombol Logout Paling Bawah -->
-    <div class="logout-section">
+    <div class="logout-section mt-auto">
         <hr class="custom-hr-bottom">
         <a href="logout.php" class="logout-link">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
+            <i class="fa-solid fa-right-from-bracket"></i> 
+            <span>Logout</span>
         </a>
     </div>
-</div>
+</div> 
