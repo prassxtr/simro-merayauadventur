@@ -25,9 +25,17 @@
             </div>
             <div class="col-md-3 mb-4">
                 <h6 class="fw-bold mb-3">Hubungi Kami</h6>
+                
+                <!-- BAGIAN ALAMAT YANG SUDAH DIUBAH MENJADI LINK GOOGLE MAPS -->
                 <p class="small text-secondary mb-2">
-                    <i class="fas fa-map-marker-alt me-2"></i> Jl.Tanray 2 Gg.Nusa Abadi No. 22b
+                    <i class="fas fa-map-marker-alt me-2"></i> 
+                    <a href="https://www.google.com/maps/search/?api=1&query=Jl.Tanray+2+Gg.Nusa+Abadi+No.+22b+Pontianak" 
+                       target="_blank" 
+                       class="text-secondary text-decoration-none">
+                        Jl.Tanray 2 Gg.Nusa Abadi No. 22b
+                    </a>
                 </p>
+                
                 <p class="small text-secondary mb-0">
                     <a href="https://wa.me/6281522969194" target="_blank" class="text-decoration-none text-secondary">
                         <i class="fas fa-phone fa-fw me-2"></i> +62 815 2296 9194
@@ -40,13 +48,17 @@
                 </p>
             </div>
         </div>
+        
         <hr class="border-secondary my-4">
+        
         <div class="text-center small text-secondary">
-            &copy; 2024 SIMRO Merayau Adventur. Semua Hak Dilindungi.
+            <!-- Tahun otomatis update menggunakan PHP date('Y') -->
+            &copy; <?= date('Y') ?> SIMRO Merayau Adventure. Semua Hak Dilindungi.
         </div>
     </div>
 </footer>
 
+<!-- Script Bootstrap & Custom -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?= BASE_URL ?>assets/js/script.js"></script>
 </body>

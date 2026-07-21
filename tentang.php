@@ -10,13 +10,30 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- Section 1: Siapa Kami -->
+<!-- Section 1: Siapa Kami (DENGAN GRID FOTO) -->
 <section class="py-5">
     <div class="container">
         <div class="row align-items-center">
+            <!-- Bagian Foto (Grid 4 Foto) -->
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="assets/img/banner/hero-bg.jpeg" alt="Tentang Kami" class="img-fluid rounded-4 shadow">
+                <div class="row g-3">
+                    <!-- Ganti 'foto1.jpg' dst dengan nama file foto Anda yang sebenarnya -->
+                    <div class="col-6">
+                        <img src="assets/img/tentang/tim.jpeg" alt="Tim SIMRO" class="img-fluid rounded-4 shadow-sm w-100" style="object-fit: cover; height: 200px;">
+                    </div>
+                    <div class="col-6">
+                        <img src="assets/img/tentang/maintenance.jpeg" alt="Basecamp SIMRO" class="img-fluid rounded-4 shadow-sm w-100" style="object-fit: cover; height: 200px;">
+                    </div>
+                    <div class="col-6">
+                        <img src="assets/img/tentang/alat.jpeg" alt="Peralatan SIMRO" class="img-fluid rounded-4 shadow-sm w-100" style="object-fit: cover; height: 200px;">
+                    </div>
+                    <div class="col-6">
+                        <img src="assets/img/tentang/kelompok.jpeg" alt="Aktivitas Outdoor" class="img-fluid rounded-4 shadow-sm w-100" style="object-fit: cover; height: 200px;">
+                    </div>
+                </div>
             </div>
+
+            <!-- Bagian Teks -->
             <div class="col-lg-6">
                 <h5 class="text-danger fw-bold text-uppercase">Siapa Kami?</h5>
                 <h2 class="fw-bold mb-4">SIMRO Merayau Adventure</h2>
@@ -26,7 +43,9 @@ include 'includes/header.php';
                 <p class="text-muted mb-4">
                     Kami hadir untuk memudahkan para pecinta alam dalam mendapatkan perlengkapan outdoor yang <strong>modern, higienis, dan terawat</strong> tanpa harus membeli dengan harga mahal. Dengan sistem pemesanan online, Anda bisa memilih alat, menentukan tanggal, dan mengambilnya langsung di basecamp kami dengan proses yang cepat dan transparan.
                 </p>
-                <a href="katalog.php" class="btn btn-danger px-4 py-2 rounded-pill">Lihat Katalog Alat</a>
+                <a href="katalog.php" class="btn btn-danger px-4 py-2 rounded-pill">
+                    <i class="fas fa-shopping-bag me-2"></i>Lihat Katalog Alat
+                </a>
             </div>
         </div>
     </div>
@@ -157,28 +176,35 @@ include 'includes/header.php';
                 <h3 class="fw-bold mb-4">Hubungi Kami</h3>
                 <div class="card border-0 shadow-sm p-4">
                     <div class="d-flex align-items-start mb-4">
-                        <i class="fas fa-map-marker-alt text-danger fa-lg mt-1 me-3"></i>
+                        <!-- Ditambahkan fa-fw agar sejajar -->
+                        <i class="fas fa-map-marker-alt text-danger fa-lg fa-fw mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Alamat Basecamp</h6>
-                            <p class="text-muted small mb-0">Jl. Tanray 2 Gg. Nusa Abadi No. 22b, Pontianak, Kalimantan Barat.</p>
+                            <p class="text-muted small mb-0">
+                                <a href="https://www.google.com/maps/search/?api=1&query=Jl.Tanray+2+Gg.Nusa+Abadi+No.+22b+Pontianak" target="_blank" class="text-muted text-decoration-none">
+                                    Jl. Tanray 2 Gg. Nusa Abadi No. 22b, Pontianak, Kalimantan Barat.
+                                </a>
+                            </p>
                         </div>
                     </div>
                     <div class="d-flex align-items-start mb-4">
-                        <i class="fas fa-phone-alt text-danger fa-lg mt-1 me-3"></i>
+                        <i class="fas fa-phone-alt text-danger fa-lg fa-fw mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Telepon / WhatsApp</h6>
-                            <p class="text-muted small mb-0">+62 815-2296-9194</p>
+                            <p class="text-muted small mb-0">
+                                <a href="https://wa.me/6281522969194" target="_blank" class="text-muted text-decoration-none">+62 815-2296-9194</a>
+                            </p>
                         </div>
                     </div>
                     <div class="d-flex align-items-start mb-4">
-                        <i class="fas fa-envelope text-danger fa-lg mt-1 me-3"></i>
+                        <i class="fas fa-envelope text-danger fa-lg fa-fw mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Email</h6>
                             <p class="text-muted small mb-0">info@simromerayau.com</p>
                         </div>
                     </div>
                     <div class="d-flex align-items-start">
-                        <i class="fas fa-clock text-danger fa-lg mt-1 me-3"></i>
+                        <i class="fas fa-clock text-danger fa-lg fa-fw mt-1 me-3"></i>
                         <div>
                             <h6 class="fw-bold mb-1">Jam Operasional</h6>
                             <p class="text-muted small mb-0">Setiap Hari: 08.00 - 23.30 WIB</p>
