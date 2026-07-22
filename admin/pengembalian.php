@@ -12,7 +12,7 @@ $search = '';
 $filter_status = '';
 
 // ==========================================
-// LOGIKA PROSES PENGEMBALIAN (SUDAH DIPERBAIKI TOTAL)
+// LOGIKA PROSES PENGEMBALIAN
 // ==========================================
 if (isset($_POST['proses_kembali'])) {
     $penyewaan_id = (int)$_POST['penyewaan_id'];
@@ -65,12 +65,16 @@ if (isset($_POST['proses_kembali'])) {
 }
 
 // ==========================================
-// PENCARIAN & FILTER
+// PENCARIAN & FILTER (DIPERBAIKI)
 // ==========================================
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 $filter_status = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : '';
 
-$where_clause = "WHERE 1=1";
+// FILTER UTAMA: Hanya tampilkan transaksi yang BUKAN pending dan BUKAN dibatalkan
+// Hanya status pembayaran 'lunas' atau 'belum lunas' (setelah diproses Admin) yang dapat masuk.
+$where_clause = "WHERE p.status_pembayaran IN ('lunas', 'belum lunas') 
+                 AND p.status_pembayaran NOT IN ('pending', 'dibatalkan')";
+
 if ($filter_status == '') {
     $where_clause .= " AND p.status_sewa IN ('diproses', 'disewa')";
 } else {
@@ -102,85 +106,6 @@ $page_title = "Kelola Pengembalian";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
-<!--     
-    <style>
-        :root { 
-            --primary-color: #990000;
-            --sidebar-width: 280px;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background-color: #f8f9fa; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-        }
-
-        /* LAYOUT BARU (SAMA SEPERTI KATALOG) */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: white;
-            border-right: 1px solid #dee2e6;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .content-wrapper {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .top-header {
-            position: sticky;
-            top: 0;
-            background: white;
-            border-bottom: 1px solid #dee2e6;
-            z-index: 100;
-            padding: 1rem 2rem;
-        }
-        
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        /* STYLE KHUSUS PENGEMBALIAN (TIDAK DIUBAH) */
-        .btn-maroon { background-color: var(--primary-color); color: white; border: none; }
-        .btn-maroon:hover { background-color: #770000; color: white; }
-        .text-maroon { color: var(--primary-color) !important; }
-        .bg-maroon { background-color: var(--primary-color) !important; }
-        .badge-diproses { background-color: #fff3cd; color: #856404; }
-        .badge-disewa { background-color: #cce5ff; color: #004085; }
-        .badge-selesai { background-color: #d4edda; color: #155724; }
-        .badge-lunas { background-color: #198754; color: white; }
-        .badge-pending { background-color: #ffc107; color: #000; }
-        
-        .kondisi-select { font-size: 0.85rem; padding: 0.3rem; }
-        .keterangan-box { display: none; margin-top: 0.5rem; }
-        
-        /* RESPONSIVE */
-        @media (max-width: 991px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .content-wrapper {
-                margin-left: 0;
-            }
-            .main-content {
-                padding: 1rem;
-            }
-        }
-    </style> -->
 </head>
 <body>
 
@@ -190,10 +115,10 @@ $page_title = "Kelola Pengembalian";
     <!-- 2. CONTENT WRAPPER -->
     <div class="content-wrapper">
         
-        <!-- 3. HEADER (DIPANGGIL DARI FILE TERPISAH) -->
+        <!-- 3. HEADER -->
         <?php include('include/header.php'); ?>
         
-        <!-- 4. MAIN CONTENT (ISI ASLI ANDA TIDAK DIUBAH) -->
+        <!-- 4. MAIN CONTENT -->
         <div class="main-content">
             <?php if(isset($_GET['success'])): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -279,7 +204,7 @@ $page_title = "Kelola Pengembalian";
                                     <tr>
                                         <td colspan="8" class="text-center py-5">
                                             <i class="fas fa-clipboard-list text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
-                                            <p class="text-muted mb-0">Tidak ada data pengembalian.</p>
+                                            <p class="text-muted mb-0">Tidak ada data pengembalian aktif.</p>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -291,7 +216,7 @@ $page_title = "Kelola Pengembalian";
         </div> <!-- End Main Content -->
     </div> <!-- End Content Wrapper -->
 
-    <!-- MODAL UNIVERSAL PENGEMBALIAN (DILETAKKAN DI LUAR WRAPPER) -->
+    <!-- MODAL UNIVERSAL PENGEMBALIAN -->
     <div class="modal fade" id="modalPengembalian" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -321,7 +246,7 @@ $page_title = "Kelola Pengembalian";
                                     </tr>
                                 </thead>
                                 <tbody id="list_barang">
-                                    <!-- Data akan diisi oleh JavaScript -->
+                                    <!-- Data diisi via JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -332,7 +257,7 @@ $page_title = "Kelola Pengembalian";
                             <ul class="mb-0 mt-1">
                                 <li><strong>Baik:</strong> Stok otomatis bertambah.</li>
                                 <li><strong>Cuci:</strong> Stok belum bertambah, masuk antrean Maintenance.</li>
-                                <li><strong>Rusak/Hilang:</strong> Stok <u>permanen tidak bertambah</u> (hilang dari inventaris) & wajib diisi keterangan.</li>
+                                <li><strong>Rusak/Hilang:</strong> Stok <u>permanen tidak bertambah</u> & wajib diisi keterangan.</li>
                             </ul>
                         </div>
                     </div>
@@ -391,16 +316,15 @@ $page_title = "Kelola Pengembalian";
                 });
         }
 
-        // FUNGSI INI SUDAH DIPERBAIKI (Typo 'each' diganti menjadi '}')
         function toggleKeterangan(selectElement, produkId) {
             const ketBox = document.getElementById('ket_' + produkId);
             if (selectElement.value === 'rusak' || selectElement.value === 'hilang') {
                 ketBox.style.display = 'block';
-                ketBox.required = true; // Wajib diisi jika rusak/hilang
+                ketBox.required = true;
             } else {
                 ketBox.style.display = 'none';
                 ketBox.required = false;
-                ketBox.value = ''; // Reset nilai
+                ketBox.value = '';
             }
         }
     </script>

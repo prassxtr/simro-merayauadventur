@@ -13,7 +13,7 @@ $search = '';
 $filter_status = '';
 
 // ==========================================
-// LOGIKA CRUD MAINTENANCE (DIPERBAIKI)
+// LOGIKA CRUD MAINTENANCE
 // ==========================================
 
 // TAMBAH MAINTENANCE MANUAL
@@ -104,6 +104,14 @@ $query_tampil = "SELECT ml.*, p.nama_produk, p.harga_sewa, p.stok, p.gambar, k.n
 
 $result = mysqli_query($conn, $query_tampil);
 
+// SIMPAN DATA MAINTENANCE AKTIF KE ARRAY UNTUK MODAL SELESAI
+$data_maintenance_aktif = [];
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data_maintenance_aktif[] = $row;
+    }
+}
+
 $query_riwayat = "SELECT ml.*, p.nama_produk 
                   FROM maintenance_log ml
                   JOIN produk p ON ml.produk_id = p.id
@@ -136,94 +144,6 @@ $page_title = "Kelola Maintenance";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
-    <!-- <style>
-        :root { 
-            --primary-color: #990000;
-            --sidebar-width: 280px;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background-color: #f8f9fa; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-        }
-
-        /* LAYOUT BARU (SAMA SEPERTI HALAMAN LAIN) */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: white;
-            border-right: 1px solid #dee2e6;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .content-wrapper {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .top-header {
-            position: sticky;
-            top: 0;
-            background: white;
-            border-bottom: 1px solid #dee2e6;
-            z-index: 100;
-            padding: 1rem 2rem;
-        }
-        
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        /* STYLE KHUSUS MAINTENANCE (TIDAK DIUBAH) */
-        .btn-maroon { background-color: var(--primary-color); color: white; border: none; }
-        .btn-maroon:hover { background-color: #770000; color: white; }
-        .text-maroon { color: var(--primary-color) !important; }
-        .bg-maroon { background-color: var(--primary-color) !important; }
-        
-        .badge-perbaikan { background-color: #fff3cd; color: #856404; }
-        .badge-selesai { background-color: #d4edda; color: #155724; }
-        .badge-batal { background-color: #f8d7da; color: #721c24; }
-        
-        .product-thumb {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .stat-card {
-            border-left: 4px solid var(--primary-color);
-            transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-2px); }
-        
-        /* RESPONSIVE */
-        @media (max-width: 991px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .content-wrapper {
-                margin-left: 0;
-            }
-            .main-content {
-                padding: 1rem;
-            }
-        }
-    </style> -->
 </head>
 <body>
 
@@ -233,7 +153,7 @@ $page_title = "Kelola Maintenance";
     <!-- 2. CONTENT WRAPPER -->
     <div class="content-wrapper">
         
-        <!-- 3. HEADER (DIPANGGIL DARI FILE TERPISAH) -->
+        <!-- 3. HEADER -->
         <?php include('include/header.php'); ?>
         
         <!-- 4. MAIN CONTENT -->
@@ -352,6 +272,7 @@ $page_title = "Kelola Maintenance";
                             <thead class="bg-light">
                                 <tr>
                                     <th class="ps-4">ALAT</th>
+                                    <th class="text-center">QTY</th>
                                     <th>TGL MULAI</th>
                                     <th>DURASI</th>
                                     <th>KETERANGAN</th>
@@ -361,11 +282,12 @@ $page_title = "Kelola Maintenance";
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if($result && mysqli_num_rows($result) > 0): ?>
-                                    <?php while($row = mysqli_fetch_assoc($result)): 
+                                <?php if(!empty($data_maintenance_aktif)): ?>
+                                    <?php foreach($data_maintenance_aktif as $row): 
                                         $durasi = floor((strtotime(date('Y-m-d')) - strtotime($row['tanggal_mulai'])) / 86400);
                                         $durasi_text = $durasi > 0 ? "$durasi hari" : "Hari ini";
                                         $badge_class = 'badge-' . str_replace('_', '', $row['status']);
+                                        $jumlah_unit = $row['jumlah'] ?? 1;
                                     ?>
                                     <tr>
                                         <td class="ps-4">
@@ -378,6 +300,11 @@ $page_title = "Kelola Maintenance";
                                                     <small class="text-muted"><?php echo htmlspecialchars($row['nama_kategori'] ?? '-'); ?></small>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning bg-opacity-20 text-dark fw-bold border border-warning px-2 py-1">
+                                                <?php echo $jumlah_unit; ?> unit
+                                            </span>
                                         </td>
                                         <td><?php echo date('d M Y', strtotime($row['tanggal_mulai'])); ?></td>
                                         <td>
@@ -415,47 +342,10 @@ $page_title = "Kelola Maintenance";
                                             <?php endif; ?>
                                         </td>
                                     </tr>
-
-                                    <!-- Modal Selesaikan Maintenance -->
-                                    <div class="modal fade" id="modalSelesai<?php echo $row['id']; ?>" tabindex="-1">
-                                        <div class="modal-dialog modal-dialog-centered modal-sm">
-                                            <div class="modal-content border-0 shadow">
-                                                <div class="modal-header border-bottom bg-success text-white">
-                                                    <h5 class="modal-title fw-bold"><i class="fas fa-check-circle me-2"></i>Selesaikan Maintenance</h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <form method="POST" action="">
-                                                    <input type="hidden" name="log_id" value="<?php echo $row['id']; ?>">
-                                                    <input type="hidden" name="produk_id" value="<?php echo $row['produk_id']; ?>">
-                                                    <div class="modal-body">
-                                                        <p>Selesaikan maintenance untuk:</p>
-                                                        <div class="bg-light p-3 rounded mb-3">
-                                                            <div class="fw-bold text-maroon"><?php echo htmlspecialchars($row['nama_produk']); ?></div>
-                                                            <small class="text-muted">Mulai: <?php echo date('d M Y', strtotime($row['tanggal_mulai'])); ?></small>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-semibold small text-muted">TANGGAL SELESAI</label>
-                                                            <input type="date" name="tanggal_selesai" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
-                                                        </div>
-                                                        <p class="small text-success mb-0">
-                                                            <i class="fas fa-info-circle me-1"></i>
-                                                            Setelah diselesaikan, status alat akan kembali ke <strong>"Tersedia"</strong> dan stok bertambah.
-                                                        </p>
-                                                    </div>
-                                                    <div class="modal-footer border-top">
-                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" name="selesai_maintenance" class="btn btn-success px-4">
-                                                            <i class="fas fa-check me-2"></i>Selesai
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">
+                                        <td colspan="8" class="text-center py-5">
                                             <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
                                             <p class="text-muted mb-0">Tidak ada maintenance aktif. Semua alat dalam kondisi baik!</p>
                                         </td>
@@ -480,6 +370,7 @@ $page_title = "Kelola Maintenance";
                             <thead class="bg-light">
                                 <tr>
                                     <th class="ps-4">ALAT</th>
+                                    <th class="text-center">QTY</th>
                                     <th>TGL MULAI</th>
                                     <th>TGL SELESAI</th>
                                     <th>DURASI</th>
@@ -491,9 +382,15 @@ $page_title = "Kelola Maintenance";
                                 <?php if($result_riwayat && mysqli_num_rows($result_riwayat) > 0): ?>
                                     <?php while($rw = mysqli_fetch_assoc($result_riwayat)): 
                                         $durasi = floor((strtotime($rw['tanggal_selesai']) - strtotime($rw['tanggal_mulai'])) / 86400);
+                                        $jumlah_unit_rw = $rw['jumlah'] ?? 1;
                                     ?>
                                     <tr>
                                         <td class="ps-4 fw-bold"><?php echo htmlspecialchars($rw['nama_produk']); ?></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark border px-2 py-1">
+                                                <?php echo $jumlah_unit_rw; ?> unit
+                                            </span>
+                                        </td>
                                         <td><?php echo date('d M Y', strtotime($rw['tanggal_mulai'])); ?></td>
                                         <td><?php echo date('d M Y', strtotime($rw['tanggal_selesai'])); ?></td>
                                         <td>
@@ -509,7 +406,7 @@ $page_title = "Kelola Maintenance";
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">Belum ada riwayat maintenance.</td>
+                                        <td colspan="7" class="text-center py-4 text-muted">Belum ada riwayat maintenance.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -520,7 +417,60 @@ $page_title = "Kelola Maintenance";
         </div> <!-- End Main Content -->
     </div> <!-- End Content Wrapper -->
 
-    <!-- MODAL TAMBAH MAINTENANCE MANUAL (DILETAKKAN DI LUAR WRAPPER) -->
+
+    <!-- ======================================================= -->
+    <!-- MODAL-MODAL DILETAKKAN DI LUAR WRAPPER UTAMA             -->
+    <!-- ======================================================= -->
+
+    <!-- 1. MODAL SELESAIKAN MAINTENANCE -->
+    <?php if(!empty($data_maintenance_aktif)): ?>
+        <?php foreach($data_maintenance_aktif as $row): ?>
+            <?php if($row['status'] == 'dalam_perbaikan'): 
+                $jumlah_unit = $row['jumlah'] ?? 1;
+            ?>
+                <div class="modal fade" id="modalSelesai<?php echo $row['id']; ?>" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-bottom bg-success text-white">
+                                <h5 class="modal-title fw-bold"><i class="fas fa-check-circle me-2"></i>Selesaikan Maintenance</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="">
+                                <input type="hidden" name="log_id" value="<?php echo $row['id']; ?>">
+                                <input type="hidden" name="produk_id" value="<?php echo $row['produk_id']; ?>">
+                                <div class="modal-body">
+                                    <p class="mb-2">Selesaikan maintenance untuk:</p>
+                                    <div class="bg-light p-3 rounded mb-3">
+                                        <div class="fw-bold text-maroon"><?php echo htmlspecialchars($row['nama_produk']); ?></div>
+                                        <div class="text-dark small mt-1">
+                                            Jumlah: <span class="badge bg-warning text-dark border fw-bold"><?php echo $jumlah_unit; ?> unit</span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">Mulai: <?php echo date('d M Y', strtotime($row['tanggal_mulai'])); ?></small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small text-muted">TANGGAL SELESAI</label>
+                                        <input type="date" name="tanggal_selesai" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                                    </div>
+                                    <p class="small text-success mb-0">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Setelah diselesaikan, status alat akan kembali ke <strong>"Tersedia"</strong> dan stok bertambah sebanyak <strong><?php echo $jumlah_unit; ?> unit</strong>.
+                                    </p>
+                                </div>
+                                <div class="modal-footer border-top">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                                    <button type="submit" name="selesai_maintenance" class="btn btn-success px-4">
+                                        <i class="fas fa-check me-2"></i>Selesai
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- 2. MODAL TAMBAH MAINTENANCE MANUAL -->
     <div class="modal fade" id="modalTambah" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -539,9 +489,12 @@ $page_title = "Kelola Maintenance";
                             <label class="form-label fw-semibold small text-muted">PILIH ALAT <span class="text-danger">*</span></label>
                             <select name="produk_id" class="form-select" required>
                                 <option value="">-- Pilih Alat --</option>
-                                <?php while($p = mysqli_fetch_assoc($list_produk)): ?>
-                                    <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['nama_produk']); ?></option>
-                                <?php endwhile; ?>
+                                <?php if($list_produk && mysqli_num_rows($list_produk) > 0): ?>
+                                    <?php mysqli_data_seek($list_produk, 0); ?>
+                                    <?php while($p = mysqli_fetch_assoc($list_produk)): ?>
+                                        <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['nama_produk']); ?></option>
+                                    <?php endwhile; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                         <div class="mb-3">
