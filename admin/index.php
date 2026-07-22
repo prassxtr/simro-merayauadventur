@@ -42,7 +42,7 @@ if (isset($_POST['simpan'])) {
     }
 
     $query = "INSERT INTO produk (nama_produk, kategori_id, deskripsi, harga_sewa, stok, gambar, status) VALUES ('$nama_produk', '$kategori_id', '$deskripsi', '$harga_sewa', '$stok', '$gambar_db', 'tersedia')";
-    if(mysqli_query($conn, $query)) { header("Location: katalog.php"); exit; } 
+    if(mysqli_query($conn, $query)) { header("Location: index.php"); exit; } 
     else { echo "<script>alert('Gagal: " . mysqli_error($conn) . "');</script>"; }
 }
 
@@ -66,13 +66,13 @@ if (isset($_POST['update'])) {
             }
         }
     }
-    if(mysqli_query($conn, $query)) { header("Location: katalog.php"); exit; }
+    if(mysqli_query($conn, $query)) { header("Location: index.php"); exit; }
     else { echo "<script>alert('Gagal update: " . mysqli_error($conn) . "');</script>"; }
 }
 
 if (isset($_GET['hapus'])) {
     mysqli_query($conn, "DELETE FROM produk WHERE id = " . (int)$_GET['hapus']);
-    header("Location: katalog.php"); exit;
+    header("Location: index.php"); exit;
 }
 
 // ==========================================

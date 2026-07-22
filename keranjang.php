@@ -1,4 +1,5 @@
 <?php 
+require_once 'config/koneksi.php';
 include 'includes/header.php'; 
 
 $total_belanja = 0;
@@ -23,8 +24,8 @@ $total_item = 0;
                             <div class="row align-items-center">
                                 <div class="col-md-2 mb-3 mb-md-0">
                                     <img src="assets/img/produk/<?= htmlspecialchars($item['gambar']) ?>" 
-                                         class="img-fluid rounded" 
-                                         alt="<?= htmlspecialchars($item['nama']) ?>">
+                                        class="img-fluid rounded" 
+                                        alt="<?= htmlspecialchars($item['nama']) ?>">
                                 </div>
                                 <div class="col-md-4 mb-3 mb-md-0">
                                     <h6 class="fw-bold mb-2"><?= htmlspecialchars($item['nama']) ?></h6>
