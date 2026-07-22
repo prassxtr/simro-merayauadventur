@@ -1,4 +1,8 @@
 <?php
+
+require_once 'include/auth_check.php';
+require_once '../config/koneksi.php';
+
 // 1. KONEKSI DATABASE
 if (file_exists('../config/koneksi.php')) {
     include '../config/koneksi.php';
@@ -138,6 +142,9 @@ $q_sewa = "SELECT penyewaan.*, users.nama_lengkap AS nama_pelanggan
 $result = mysqli_query($conn, $q_sewa);
 
 $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
+
+// Set judul halaman untuk header
+$page_title = "Kelola Penyewaan";
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +152,7 @@ $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Penyewaan Kasir - SIMRO</title>
+    <title><?= $page_title; ?> - SIMRO</title>
     <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -155,11 +162,68 @@ $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
     <style>
-        body { background-color: #f4f5f8; font-family: 'Segoe UI', system-ui, sans-serif; color: #2c3345; }
-        .main-content { margin-left: 260px; padding: 25px 35px; min-height: 100vh; }
-        @media (max-width: 991px) { .main-content { margin-left: 0; padding: 15px; } }
+        :root { 
+            --primary-color: #800000; /* Disesuaikan dengan warna btn-brand Anda */
+            --sidebar-width: 280px;
+        }
         
-        .btn-brand { background-color: #800000; color: #fff; font-weight: 600; border-radius: 8px; border: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: #f4f5f8; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            color: #2c3345; 
+        }
+
+        /* LAYOUT BARU (SAMA SEPERTI KATALOG) */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #dee2e6;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .content-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+.top-header {
+    position: sticky;
+    top: 0;
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-bottom: none;
+    z-index: 100;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Agar teks di header tetap terlihat */
+.top-header h4,
+.top-header .fw-bold,
+.top-header .text-dark {
+    color: white !important;
+}
+
+.top-header .text-muted {
+    color: rgba(255,255,255,0.8) !important;
+}
+        
+        .main-content {
+            flex: 1;
+            padding: 25px 35px;
+        }
+
+        /* STYLE KHUSUS PENYEWAAN (TIDAK DIUBAH) */
+        .btn-brand { background-color: var(--primary-color); color: #fff; font-weight: 600; border-radius: 8px; border: none; }
         .btn-brand:hover { background-color: #600000; color: #fff; }
         .card-custom { background: #fff; border: 1px solid #e2e7f0; border-radius: 12px; padding: 20px; }
         
@@ -171,248 +235,266 @@ $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
         .bg-lunas { background-color: #dcfce7; color: #15803d; }
         .bg-batal { background-color: #fee2e2; color: #b91c1c; }
         .box-kasir { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .content-wrapper {
+                margin-left: 0;
+            }
+            .main-content {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- IMPORT SIDEBAR -->
-    <?php 
-    if (file_exists('include/sidebar.php')) include 'include/sidebar.php'; 
-    elseif (file_exists('includes/sidebar.php')) include 'includes/sidebar.php'; 
-    elseif (file_exists('../include/sidebar.php')) include '../include/sidebar.php'; 
-    ?>
+    <!-- 1. SIDEBAR -->
+    <?php include('include/sidebar.php'); ?>
 
-    <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="fw-bold m-0 d-inline">Kelola Penyewaan</h4>
-                <span class="text-muted ms-3 border-start ps-3 small"><?= date('l, j F Y'); ?></span>
+    <!-- 2. CONTENT WRAPPER -->
+    <div class="content-wrapper">
+        
+        <!-- 3. HEADER (DIPANGGIL DARI FILE TERPISAH) -->
+        <?php include('include/header.php'); ?>
+        
+        <!-- 4. MAIN CONTENT (ISI ASLI ANDA TIDAK DIUBAH) -->
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                
+                <button type="button" class="btn btn-brand btn-sm px-3 py-2 shadow-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalKasirSewa">
+                    <i class="fa-solid fa-cart-plus me-1"></i> Buat Sewa Baru (Kasir)
+                </button>
             </div>
-            <button type="button" class="btn btn-brand btn-sm px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalKasirSewa">
-                <i class="fa-solid fa-cart-plus me-1"></i> Buat Sewa Baru (Kasir)
-            </button>
-        </div>
 
-        <?php if (isset($_GET['pesan'])): ?>
-            <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
-                <i class="fa-solid fa-circle-check me-2"></i>
-                <?php 
-                    if ($_GET['pesan'] == 'berhasil_tambah') echo "Sewa berhasil disimpan & stok produk berkurang!";
-                    elseif ($_GET['pesan'] == 'berhasil_update') echo "Status transaksi & pembayaran berhasil diperbarui!";
-                    elseif ($_GET['pesan'] == 'berhasil_hapus') echo "Transaksi dihapus & stok produk dikembalikan!";
-                ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
-        <div class="card-custom">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-bold m-0 text-uppercase">Daftar Transaksi Penyewaan</h6>
-                    <small class="text-muted">Kelola status, rincian produk, sisa tagihan, dan operasional sewa.</small>
+            <?php if (isset($_GET['pesan'])): ?>
+                <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="fa-solid fa-circle-check me-2"></i>
+                    <?php 
+                        if ($_GET['pesan'] == 'berhasil_tambah') echo "Sewa berhasil disimpan & stok produk berkurang!";
+                        elseif ($_GET['pesan'] == 'berhasil_update') echo "Status transaksi & pembayaran berhasil diperbarui!";
+                        elseif ($_GET['pesan'] == 'berhasil_hapus') echo "Transaksi dihapus & stok produk dikembalikan!";
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <div class="table-responsive">
-                <table class="table table-clean align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>NOTA / PELANGGAN</th>
-                            <th>BARANG YANG DISEWA</th>
-                            <th>TANGGAL SEWA</th>
-                            <th>KEUANGAN</th>
-                            <th>STATUS</th>
-                            <th class="text-center">AKSI OPERASIONAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result && mysqli_num_rows($result) > 0): ?>
-                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                <?php 
-                                    $tot_harga   = floatval($row['total_harga']);
-                                    $sdh_bayar   = isset($row['sudah_dibayar']) ? floatval($row['sudah_dibayar']) : 0;
-                                    $sisa_tampil = max(0, $tot_harga - $sdh_bayar);
+            <div class="card-custom">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold m-0 text-uppercase">Daftar Transaksi Penyewaan</h6>
+                        <small class="text-muted">Kelola status, rincian produk, sisa tagihan, dan operasional sewa.</small>
+                    </div>
+                </div>
 
-                                    // Ambil Rincian Produk dari tabel detail_penyewaan
-                                    $sewa_id = $row['id'];
-                                    $rincian_items = [];
-                                    $q_dtl = mysqli_query($conn, "SELECT dp.jumlah, p.nama_produk 
-                                                                  FROM detail_penyewaan dp 
-                                                                  JOIN produk p ON dp.produk_id = p.id 
-                                                                  WHERE dp.penyewaan_id = '$sewa_id'");
-                                    if ($q_dtl && mysqli_num_rows($q_dtl) > 0) {
-                                        while ($dtl = mysqli_fetch_assoc($q_dtl)) {
-                                            $rincian_items[] = "- " . htmlspecialchars($dtl['nama_produk']) . " (" . $dtl['jumlah'] . " Unit)";
+                <div class="table-responsive">
+                    <table class="table table-clean align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>NOTA / PELANGGAN</th>
+                                <th>BARANG YANG DISEWA</th>
+                                <th>TANGGAL SEWA</th>
+                                <th>KEUANGAN</th>
+                                <th>STATUS</th>
+                                <th class="text-center">AKSI OPERASIONAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                    <?php 
+                                        $tot_harga   = floatval($row['total_harga']);
+                                        $sdh_bayar   = isset($row['sudah_dibayar']) ? floatval($row['sudah_dibayar']) : 0;
+                                        $sisa_tampil = max(0, $tot_harga - $sdh_bayar);
+
+                                        // Ambil Rincian Produk dari tabel detail_penyewaan
+                                        $sewa_id = $row['id'];
+                                        $rincian_items = [];
+                                        $q_dtl = mysqli_query($conn, "SELECT dp.jumlah, p.nama_produk 
+                                                                      FROM detail_penyewaan dp 
+                                                                      JOIN produk p ON dp.produk_id = p.id 
+                                                                      WHERE dp.penyewaan_id = '$sewa_id'");
+                                        if ($q_dtl && mysqli_num_rows($q_dtl) > 0) {
+                                            while ($dtl = mysqli_fetch_assoc($q_dtl)) {
+                                                $rincian_items[] = "- " . htmlspecialchars($dtl['nama_produk']) . " (" . $dtl['jumlah'] . " Unit)";
+                                            }
                                         }
-                                    }
-                                ?>
-                                <tr>
-                                    <td>
-                                        <small class="text-muted font-monospace d-block"><?= $row['nomor_pesanan']; ?></small>
-                                        <strong class="text-dark">
-                                            <?= !empty($row['nama_pelanggan']) ? htmlspecialchars($row['nama_pelanggan']) : (!empty($row['user_id']) ? "Pelanggan #" . $row['user_id'] : "Pelanggan Umum"); ?>
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        <span class="d-block fw-semibold text-wrap" style="max-width: 250px;">
-                                            <?= !empty($rincian_items) ? implode("<br>", $rincian_items) : '<span class="text-muted italic">Transaksi ID #' . $row['id'] . '</span>'; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <small class="d-block text-muted"><i class="fa-regular fa-circle-check text-success me-1"></i>Ambil: <?= $row['tanggal_sewa']; ?></small>
-                                        <small class="d-block text-muted"><i class="fa-regular fa-circle-xmark text-danger me-1"></i>Kembali: <?= $row['tanggal_kembali']; ?></small>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold">Rp <?= number_format($tot_harga, 0, ',', '.'); ?></div>
-                                        <small class="<?= strtolower($row['status_pembayaran']) == 'lunas' ? 'text-success fw-bold' : 'text-warning fw-bold' ?>">
-                                            <?= ucfirst($row['status_pembayaran']); ?>
-                                        </small>
-                                        
-                                        <?php if (strtolower($row['status_pembayaran']) != 'lunas'): ?>
-                                            <div class="small text-muted mt-1" style="font-size: 0.78rem;">
-                                                Masuk: <span class="text-success">Rp <?= number_format($sdh_bayar, 0, ',', '.'); ?></span><br>
-                                                Sisa: <span class="text-danger fw-bold">Rp <?= number_format($sisa_tampil, 0, ',', '.'); ?></span>
-                                            </div>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php 
-                                            $st_pemb = strtolower($row['status_pembayaran']);
-                                            $badge = 'bg-dp';
-                                            if ($st_pemb == 'lunas') $badge = 'bg-lunas';
-                                            elseif ($st_pemb == 'dibatalkan') $badge = 'bg-batal';
-                                        ?>
-                                        <span class="badge-status <?= $badge; ?>">
-                                            <?= ucfirst($row['status_pembayaran']); ?> (<?= ucfirst($row['status_sewa']); ?>)
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-light text-primary border-0 me-1" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id']; ?>" title="Lihat Bukti Bayar">
-                                            <i class="fa-solid fa-image"></i>
-                                        </button>
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted font-monospace d-block"><?= $row['nomor_pesanan']; ?></small>
+                                            <strong class="text-dark">
+                                                <?= !empty($row['nama_pelanggan']) ? htmlspecialchars($row['nama_pelanggan']) : (!empty($row['user_id']) ? "Pelanggan #" . $row['user_id'] : "Pelanggan Umum"); ?>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <span class="d-block fw-semibold text-wrap" style="max-width: 250px;">
+                                                <?= !empty($rincian_items) ? implode("<br>", $rincian_items) : '<span class="text-muted italic">Transaksi ID #' . $row['id'] . '</span>'; ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="d-block text-muted"><i class="fa-regular fa-circle-check text-success me-1"></i>Ambil: <?= $row['tanggal_sewa']; ?></small>
+                                            <small class="d-block text-muted"><i class="fa-regular fa-circle-xmark text-danger me-1"></i>Kembali: <?= $row['tanggal_kembali']; ?></small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">Rp <?= number_format($tot_harga, 0, ',', '.'); ?></div>
+                                            <small class="<?= strtolower($row['status_pembayaran']) == 'lunas' ? 'text-success fw-bold' : 'text-warning fw-bold' ?>">
+                                                <?= ucfirst($row['status_pembayaran']); ?>
+                                            </small>
+                                            
+                                            <?php if (strtolower($row['status_pembayaran']) != 'lunas'): ?>
+                                                <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                                                    Masuk: <span class="text-success">Rp <?= number_format($sdh_bayar, 0, ',', '.'); ?></span><br>
+                                                    Sisa: <span class="text-danger fw-bold">Rp <?= number_format($sisa_tampil, 0, ',', '.'); ?></span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php 
+                                                $st_pemb = strtolower($row['status_pembayaran']);
+                                                $badge = 'bg-dp';
+                                                if ($st_pemb == 'lunas') $badge = 'bg-lunas';
+                                                elseif ($st_pemb == 'dibatalkan') $badge = 'bg-batal';
+                                            ?>
+                                            <span class="badge-status <?= $badge; ?>">
+                                                <?= ucfirst($row['status_pembayaran']); ?> (<?= ucfirst($row['status_sewa']); ?>)
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-light text-primary border-0 me-1" data-bs-toggle="modal" data-bs-target="#modalBukti<?= $row['id']; ?>" title="Lihat Bukti Bayar">
+                                                <i class="fa-solid fa-image"></i>
+                                            </button>
 
-                                        <button type="button" class="btn btn-sm btn-light text-warning border-0 me-1" data-bs-toggle="modal" data-bs-target="#modalEdit<?= $row['id']; ?>" title="Edit Status">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </button>
+                                            <button type="button" class="btn btn-sm btn-light text-warning border-0 me-1" data-bs-toggle="modal" data-bs-target="#modalEdit<?= $row['id']; ?>" title="Edit Status">
+                                                <i class="fa-regular fa-pen-to-square"></i>
+                                            </button>
 
-                                        <a href="penyewaan.php?aksi=hapus&id=<?= $row['id']; ?>" class="btn btn-sm btn-light text-danger border-0" onclick="return confirm('Hapus transaksi <?= $row['nomor_pesanan']; ?>? (Stok akan dikembalikan)')" title="Hapus">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                            <a href="penyewaan.php?aksi=hapus&id=<?= $row['id']; ?>" class="btn btn-sm btn-light text-danger border-0" onclick="return confirm('Hapus transaksi <?= $row['nomor_pesanan']; ?>? (Stok akan dikembalikan)')" title="Hapus">
+                                                <i class="fa-regular fa-trash-can"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
 
-                                <!-- MODAL BUKTI BAYAR -->
-                                <div class="modal fade" id="modalBukti<?= $row['id']; ?>" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow">
-                                            <div class="modal-header">
-                                                <h6 class="modal-title fw-bold">Bukti Pembayaran - <?= $row['nomor_pesanan']; ?></h6>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body text-center p-4">
-                                                <?php 
-                                                    $file_bukti = isset($row['bukti_pembayaran']) ? $row['bukti_pembayaran'] : '';
-                                                    $path_bukti = "../assets/img/bukti/" . $file_bukti;
-                                                ?>
-                                                <?php if (!empty($file_bukti) && file_exists($path_bukti)): ?>
-                                                    <img src="<?= $path_bukti; ?>" class="img-fluid rounded shadow-sm" style="max-height: 400px;" alt="Bukti Transfer">
-                                                    <a href="<?= $path_bukti; ?>" target="_blank" class="btn btn-sm btn-outline-primary d-block mt-3">
-                                                        <i class="fa-solid fa-up-right-from-square me-1"></i> Buka Ukuran Penuh
-                                                    </a>
-                                                <?php else: ?>
-                                                    <div class="py-4 text-muted">
-                                                        <i class="fa-regular fa-image fa-3x mb-3 text-secondary opacity-50 d-block"></i>
-                                                        Tidak ada bukti pembayaran diunggah.<br>
-                                                        <small class="text-muted">(Transaksi diinput langsung dari Kasir Admin)</small>
-                                                    </div>
-                                                <?php endif; ?>
+                                    <!-- MODAL BUKTI BAYAR -->
+                                    <div class="modal fade" id="modalBukti<?= $row['id']; ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header">
+                                                    <h6 class="modal-title fw-bold">Bukti Pembayaran - <?= $row['nomor_pesanan']; ?></h6>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body text-center p-4">
+                                                    <?php 
+                                                        $file_bukti = isset($row['bukti_pembayaran']) ? $row['bukti_pembayaran'] : '';
+                                                        $path_bukti = "../assets/img/bukti/" . $file_bukti;
+                                                    ?>
+                                                    <?php if (!empty($file_bukti) && file_exists($path_bukti)): ?>
+                                                        <img src="<?= $path_bukti; ?>" class="img-fluid rounded shadow-sm" style="max-height: 400px;" alt="Bukti Transfer">
+                                                        <a href="<?= $path_bukti; ?>" target="_blank" class="btn btn-sm btn-outline-primary d-block mt-3">
+                                                            <i class="fa-solid fa-up-right-from-square me-1"></i> Buka Ukuran Penuh
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <div class="py-4 text-muted">
+                                                            <i class="fa-regular fa-image fa-3x mb-3 text-secondary opacity-50 d-block"></i>
+                                                            Tidak ada bukti pembayaran diunggah.<br>
+                                                            <small class="text-muted">(Transaksi diinput langsung dari Kasir Admin)</small>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- MODAL EDIT STATUS & KALKULATOR SISA BAYAR -->
-                                <div class="modal fade modal-edit-sewa" id="modalEdit<?= $row['id']; ?>" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow">
-                                            <div class="modal-header">
-                                                <h6 class="modal-title fw-bold">Update Status & Pembayaran - <?= $row['nomor_pesanan']; ?></h6>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <form method="POST" action="">
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="id_sewa" value="<?= $row['id']; ?>">
-                                                    <input type="hidden" class="val-total" name="total_harga_val" value="<?= $tot_harga; ?>">
-                                                    
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Total Transaksi</label>
-                                                        <input type="text" class="form-control bg-light fw-bold text-dark" value="Rp <?= number_format($tot_harga, 0, ',', '.'); ?>" readonly>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Status Pembayaran</label>
-                                                        <select name="status_pembayaran" class="form-select status-bayar-select" onchange="toggleBoxKalkulator(this)">
-                                                            <option value="pending" <?= strtolower($row['status_pembayaran']) == 'pending' ? 'selected' : '' ?>>Pending / Booking DP</option>
-                                                            <option value="belum lunas" <?= strtolower($row['status_pembayaran']) == 'belum lunas' ? 'selected' : '' ?>>Belum Lunas</option>
-                                                            <option value="lunas" <?= strtolower($row['status_pembayaran']) == 'lunas' ? 'selected' : '' ?>>Lunas</option>
-                                                            <option value="dibatalkan" <?= strtolower($row['status_pembayaran']) == 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <!-- KALKULATOR SISA BAYAR (OTOMATIS RESPONSIF) -->
-                                                    <div class="p-3 bg-light rounded border mb-3 box-kalkulator <?= strtolower($row['status_pembayaran']) == 'lunas' ? 'd-none' : '' ?>">
+                                    <!-- MODAL EDIT STATUS & KALKULATOR SISA BAYAR -->
+                                    <div class="modal fade modal-edit-sewa" id="modalEdit<?= $row['id']; ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header">
+                                                    <h6 class="modal-title fw-bold">Update Status & Pembayaran - <?= $row['nomor_pesanan']; ?></h6>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST" action="">
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="id_sewa" value="<?= $row['id']; ?>">
+                                                        <input type="hidden" class="val-total" name="total_harga_val" value="<?= $tot_harga; ?>">
+                                                        
                                                         <div class="mb-3">
-                                                            <label class="form-label small fw-bold text-success">Jumlah Yang Sudah Dibayar (Rp)</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">Rp</span>
-                                                                <input type="number" 
-                                                                       name="sudah_dibayar" 
-                                                                       class="form-control val-dibayar" 
-                                                                       value="<?= $sdh_bayar; ?>" 
-                                                                       min="0"
-                                                                       max="<?= $tot_harga; ?>"
-                                                                       oninput="hitungSisaTagihan(this)"
-                                                                       onkeyup="hitungSisaTagihan(this)">
+                                                            <label class="form-label small fw-bold">Total Transaksi</label>
+                                                            <input type="text" class="form-control bg-light fw-bold text-dark" value="Rp <?= number_format($tot_harga, 0, ',', '.'); ?>" readonly>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Status Pembayaran</label>
+                                                            <select name="status_pembayaran" class="form-select status-bayar-select" onchange="toggleBoxKalkulator(this)">
+                                                                <option value="pending" <?= strtolower($row['status_pembayaran']) == 'pending' ? 'selected' : '' ?>>Pending / Booking DP</option>
+                                                                <option value="belum lunas" <?= strtolower($row['status_pembayaran']) == 'belum lunas' ? 'selected' : '' ?>>Belum Lunas</option>
+                                                                <option value="lunas" <?= strtolower($row['status_pembayaran']) == 'lunas' ? 'selected' : '' ?>>Lunas</option>
+                                                                <option value="dibatalkan" <?= strtolower($row['status_pembayaran']) == 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <!-- KALKULATOR SISA BAYAR (OTOMATIS RESPONSIF) -->
+                                                        <div class="p-3 bg-light rounded border mb-3 box-kalkulator <?= strtolower($row['status_pembayaran']) == 'lunas' ? 'd-none' : '' ?>">
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold text-success">Jumlah Yang Sudah Dibayar (Rp)</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">Rp</span>
+                                                                    <input type="number" 
+                                                                           name="sudah_dibayar" 
+                                                                           class="form-control val-dibayar" 
+                                                                           value="<?= $sdh_bayar; ?>" 
+                                                                           min="0"
+                                                                           max="<?= $tot_harga; ?>"
+                                                                           oninput="hitungSisaTagihan(this)"
+                                                                           onkeyup="hitungSisaTagihan(this)">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="p-2 bg-white rounded border">
+                                                                <label class="form-label small fw-bold text-danger m-0 d-block">Sisa Tagihan (Otomatis):</label>
+                                                                <h4 class="fw-bold text-danger m-0 lbl-sisa">Rp <?= number_format($sisa_tampil, 0, ',', '.'); ?></h4>
                                                             </div>
                                                         </div>
 
-                                                        <div class="p-2 bg-white rounded border">
-                                                            <label class="form-label small fw-bold text-danger m-0 d-block">Sisa Tagihan (Otomatis):</label>
-                                                            <h4 class="fw-bold text-danger m-0 lbl-sisa">Rp <?= number_format($sisa_tampil, 0, ',', '.'); ?></h4>
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Status Sewa</label>
+                                                            <select name="status_sewa" class="form-select">
+                                                                <option value="diproses" <?= strtolower($row['status_sewa']) == 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                                                                <option value="disewa" <?= strtolower($row['status_sewa']) == 'disewa' ? 'selected' : '' ?>>Disewa</option>
+                                                                <option value="selesai" <?= strtolower($row['status_sewa']) == 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                                                                <option value="dibatalkan" <?= strtolower($row['status_sewa']) == 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
+                                                            </select>
                                                         </div>
                                                     </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Status Sewa</label>
-                                                        <select name="status_sewa" class="form-select">
-                                                            <option value="diproses" <?= strtolower($row['status_sewa']) == 'diproses' ? 'selected' : '' ?>>Diproses</option>
-                                                            <option value="disewa" <?= strtolower($row['status_sewa']) == 'disewa' ? 'selected' : '' ?>>Disewa</option>
-                                                            <option value="selesai" <?= strtolower($row['status_sewa']) == 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                                                            <option value="dibatalkan" <?= strtolower($row['status_sewa']) == 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
-                                                        </select>
+                                                    <div class="modal-footer bg-light">
+                                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" name="update_status" class="btn btn-sm btn-brand">Simpan Perubahan</button>
                                                     </div>
-                                                </div>
-                                                <div class="modal-footer bg-light">
-                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" name="update_status" class="btn btn-sm btn-brand">Simpan Perubahan</button>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">Belum ada data penyewaan.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">Belum ada data penyewaan.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Content Wrapper -->
 
-    <!-- MODAL KASIR SEWA BARU -->
+    <!-- MODAL KASIR SEWA BARU (DILETAKKAN DI LUAR WRAPPER AGAR TIDAK TERPOTONG) -->
     <div class="modal fade" id="modalKasirSewa" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
@@ -471,7 +553,7 @@ $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
                                     <input type="number" id="pilih_jumlah" class="form-control form-control-sm" value="1" min="1" placeholder="Jumlah Unit" style="height: 38px;">
                                 </div>
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-primary w-100 fw-bold" onclick="tambahKeKeranjang()" style="height: 38px;">
+                                    <button type="button" class="btn btn-maroon w-100 fw-bold" onclick="tambahKeKeranjang()" style="height: 38px;">
                                         <i class="fa-solid fa-plus me-1"></i> Tambahkan
                                     </button>
                                 </div>
@@ -539,7 +621,7 @@ $nota_otomatis = "NTA-" . date('ymd') . "-" . sprintf("%03d", rand(1, 999));
         </div>
     </div>
 
-    <!-- JAVASCRIPT LIBRARIES -->
+    <!-- JAVASCRIPT LIBRARIES (TIDAK DIUBAH SAMA SEKALI) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

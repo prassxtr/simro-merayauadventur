@@ -1,12 +1,12 @@
 <?php
-// logout.php
+// admin/logout.php
 
 session_start();
 
 // Hapus semua data session
 $_SESSION = array();
 
-// Hapus cookie session jika ada
+// Hapus cookie session
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -18,7 +18,7 @@ if (ini_get("session.use_cookies")) {
 // Hancurkan session
 session_destroy();
 
-// Redirect ke halaman login
-header("Location: login.php?logout=1");
+// PENTING: Redirect ke login.php di folder ROOT (naik satu tingkat dengan ../)
+header("Location: ../login.php?logout=1");
 exit();
 ?>

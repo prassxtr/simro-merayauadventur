@@ -1,4 +1,5 @@
 <?php 
+require_once 'include/auth_user.php';
 require_once 'config/koneksi.php';
 include 'includes/header.php'; 
 

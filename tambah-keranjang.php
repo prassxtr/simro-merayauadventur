@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once 'config/koneksi.php';
+require_once 'include/auth_user.php';
+require_once 'config/koneksi.php';;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $produk_id = (int)$_POST['produk_id'];

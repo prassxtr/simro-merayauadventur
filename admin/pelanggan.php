@@ -1,4 +1,7 @@
 <?php
+require_once 'include/auth_check.php';
+require_once '../config/koneksi.php';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include('../config/koneksi.php');
@@ -11,55 +14,34 @@ $edit_id = null;
 $edit_data = null;
 
 // ==========================================
-// LOGIKA PROSES PENGEMBALIAN
+// LOGIKA CRUD PELANGGAN
 // ==========================================
-if (isset($_POST['proses_kembali'])) {
-    $penyewaan_id = (int)$_POST['penyewaan_id'];
-    $maintenance_items = isset($_POST['maintenance_items']) ? $_POST['maintenance_items'] : [];
+
+// 1. AKSI TAMBAH PELANGGAN
+if (isset($_POST['tambah'])) {
+    $nama = mysqli_real_escape_string($conn, $_POST['nama_lengkap']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $telepon = mysqli_real_escape_string($conn, $_POST['no_telepon']);
+    $alamat = mysqli_real_escape_string($conn, $_POST['alamat']);
+    // Password default untuk pelanggan baru (bisa diganti nanti oleh pelanggan)
+    $password = password_hash('123456', PASSWORD_DEFAULT); 
     
-    mysqli_begin_transaction($conn);
-    
-    try {
-        // Ambil semua item dalam penyewaan ini
-        $query_detail = "SELECT dp.produk_id, dp.jumlah, p.nama_produk, p.stok 
-                        FROM detail_penyewaan dp 
-                        JOIN produk p ON dp.produk_id = p.id 
-                        WHERE dp.penyewaan_id = $penyewaan_id";
-        $result_detail = mysqli_query($conn, $query_detail);
-        
-        while($item = mysqli_fetch_assoc($result_detail)) {
-            $produk_id = $item['produk_id'];
-            $jumlah = $item['jumlah'];
-            $nama_produk = $item['nama_produk'];
-            
-            if(in_array($produk_id, $maintenance_items)) {
-                // Barang masuk maintenance - update status produk
-                mysqli_query($conn, "UPDATE produk SET status = 'maintenance' WHERE id = $produk_id");
-                
-                // CATAT KE MAINTENANCE_LOG
-                $keterangan = "Rusak saat pengembalian sewa - " . date('Y-m-d');
-                mysqli_query($conn, "INSERT INTO maintenance_log (produk_id, tanggal_mulai, keterangan, biaya, status) 
-                                    VALUES ($produk_id, NOW(), '$keterangan', 0, 'dalam_perbaikan')");
-            } else {
-                // Barang kembali normal - stok bertambah
-                mysqli_query($conn, "UPDATE produk SET stok = stok + $jumlah, status = 'tersedia' WHERE id = $produk_id");
-            }
+    $check = mysqli_query($conn, "SELECT id FROM users WHERE email = '$email'");
+    if (mysqli_num_rows($check) > 0) {
+        echo "<script>alert('Email sudah terdaftar!');</script>";
+    } else {
+        $query = "INSERT INTO users (nama_lengkap, email, password, no_telepon, alamat, role) 
+                  VALUES ('$nama', '$email', '$password', '$telepon', '$alamat', 'customer')";
+        if (mysqli_query($conn, $query)) {
+            header("Location: pelanggan.php?success=tambah");
+            exit;
+        } else {
+            echo "<script>alert('Gagal menambah pelanggan: " . mysqli_error($conn) . "');</script>";
         }
-        
-        // Update status penyewaan menjadi selesai
-        mysqli_query($conn, "UPDATE penyewaan SET status_sewa = 'selesai' WHERE id = $penyewaan_id");
-        
-        mysqli_commit($conn);
-        header("Location: pengembalian.php?success=1");
-        exit;
-        
-    } catch (Exception $e) {
-        mysqli_rollback($conn);
-        echo "<script>alert('Gagal memproses: " . $e->getMessage() . "');</script>";
     }
 }
 
-// AKSI EDIT PELANGGAN
+// 2. AKSI EDIT PELANGGAN
 if (isset($_POST['edit'])) {
     $id = (int)$_POST['id'];
     $nama = mysqli_real_escape_string($conn, $_POST['nama_lengkap']);
@@ -69,7 +51,6 @@ if (isset($_POST['edit'])) {
     
     $query = "UPDATE users SET nama_lengkap='$nama', email='$email', no_telepon='$telepon', alamat='$alamat' WHERE id=$id AND role='customer'";
     
-    
     if (mysqli_query($conn, $query)) {
         header("Location: pelanggan.php?success=edit");
         exit;
@@ -78,7 +59,7 @@ if (isset($_POST['edit'])) {
     }
 }
 
-// AKSI HAPUS PELANGGAN
+// 3. AKSI HAPUS PELANGGAN
 if (isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     if (mysqli_query($conn, "DELETE FROM users WHERE id=$id AND role='customer'")) {
@@ -90,7 +71,7 @@ if (isset($_GET['hapus'])) {
 }
 
 // ==========================================
-// PENCARIAN
+// PENCARIAN & QUERY
 // ==========================================
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
@@ -114,6 +95,9 @@ if (isset($_GET['edit'])) {
 // Hitung total pelanggan
 $total_pelanggan = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHERE role='customer'");
 $total_count = mysqli_fetch_assoc($total_pelanggan)['total'];
+
+// Set judul halaman untuk header
+$page_title = "Kelola Pelanggan";
 ?>
 
 <!DOCTYPE html>
@@ -121,14 +105,58 @@ $total_count = mysqli_fetch_assoc($total_pelanggan)['total'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Pelanggan - SIMRO</title>
+    <title><?= $page_title; ?> - SIMRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        :root { --primary-color: #990000; }
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .main-content { margin-left: 280px; padding: 2rem; }
+    <link href="../assets/css/style.css" rel="stylesheet">
+    <!-- <style>
+        :root { 
+            --primary-color: #990000;
+            --sidebar-width: 280px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: #f8f9fa; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+        }
+
+        /* LAYOUT BARU (SAMA SEPERTI KATALOG & PENYEWAAN) */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #dee2e6;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .content-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+            z-index: 100;
+            padding: 1rem 2rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* STYLE KHUSUS PELANGGAN (TIDAK DIUBAH) */
         .btn-maroon { background-color: var(--primary-color); color: white; border: none; }
         .btn-maroon:hover { background-color: #770000; color: white; }
         .text-maroon { color: var(--primary-color) !important; }
@@ -154,191 +182,201 @@ $total_count = mysqli_fetch_assoc($total_pelanggan)['total'];
         }
         .stat-card:hover { transform: translateY(-2px); }
         
+        /* RESPONSIVE */
         @media (max-width: 991px) {
-            .main-content { margin-left: 0; padding: 1rem; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .content-wrapper {
+                margin-left: 0;
+            }
+            .main-content {
+                padding: 1rem;
+            }
         }
-    </style>
+    </style> -->
 </head>
 <body>
 
+    <!-- 1. SIDEBAR -->
     <?php include('include/sidebar.php'); ?>
 
-    <div class="main-content">
+    <!-- 2. CONTENT WRAPPER -->
+    <div class="content-wrapper">
         
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold mb-0 text-dark">
-                <i class="fas fa-users me-2 text-maroon"></i>Kelola Pelanggan
-            </h4>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end d-none d-sm-block">
-                    <div class="fw-bold">Admin SIMRO</div>
-                    <small class="text-muted">Administrator</small>
+        <!-- 3. HEADER (DIPANGGIL DARI FILE TERPISAH) -->
+        <?php include('include/header.php'); ?>
+        
+        <!-- 4. MAIN CONTENT (ISI ASLI ANDA) -->
+        <div class="main-content">
+            
+            <!-- Alert Success -->
+            <?php if(isset($_GET['success'])): 
+                $msg = $_GET['success'] == 'tambah' ? 'Pelanggan baru berhasil ditambahkan!' : 
+                       ($_GET['success'] == 'edit' ? 'Data pelanggan berhasil diperbarui!' : 'Pelanggan berhasil dihapus!');
+            ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <?php echo $msg; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <div class="bg-maroon text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-        </div>
+            <?php endif; ?>
 
-        <!-- Alert Success -->
-        <?php if(isset($_GET['success'])): 
-            $msg = $_GET['success'] == 'tambah' ? 'Pelanggan baru berhasil ditambahkan!' : 
-                   ($_GET['success'] == 'edit' ? 'Data pelanggan berhasil diperbarui!' : 'Pelanggan berhasil dihapus!');
-        ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> <?php echo $msg; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
-        <!-- Stat Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <div class="card stat-card border-0 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-maroon bg-opacity-10 text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                            <i class="fas fa-users fa-lg"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Total Pelanggan</div>
-                            <div class="fw-bold fs-4 mb-0"><?php echo $total_count; ?></div>
+            <!-- Stat Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-maroon bg-opacity-10 text-maroon rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-users fa-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Total Pelanggan</div>
+                                <div class="fw-bold fs-4 mb-0"><?php echo $total_count; ?></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                            <i class="fas fa-user-check fa-lg"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Pelanggan Aktif</div>
-                            <div class="fw-bold fs-4 mb-0"><?php echo $total_count; ?></div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user-check fa-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Pelanggan Aktif</div>
+                                <div class="fw-bold fs-4 mb-0"><?php echo $total_count; ?></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                            <i class="fas fa-user-plus fa-lg"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small">Bulan Ini</div>
-                            <div class="fw-bold fs-4 mb-0">
-                                <?php 
-                                $bulan_ini = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHERE role='customer' AND MONTH(created_at) = MONTH(CURRENT_DATE())");
-                                echo mysqli_fetch_assoc($bulan_ini)['total'];
-                                ?>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user-plus fa-lg"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Bulan Ini</div>
+                                <div class="fw-bold fs-4 mb-0">
+                                    <?php 
+                                    $bulan_ini = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHERE role='customer' AND MONTH(created_at) = MONTH(CURRENT_DATE())");
+                                    echo mysqli_fetch_assoc($bulan_ini)['total'];
+                                    ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Search & Tombol Tambah -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-3">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-6">
-                        <form method="GET" action="" class="d-flex gap-2">
-                            <div class="input-group flex-grow-1">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari nama, email, atau no. telepon..." value="<?php echo htmlspecialchars($search); ?>">
-                            </div>
-                            <button type="submit" class="btn btn-maroon"><i class="fas fa-search"></i></button>
-                            <?php if($search): ?>
-                                <a href="pelanggan.php" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
-                            <?php endif; ?>
-                        </form>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <button class="btn btn-maroon" data-bs-toggle="modal" data-bs-target="#modalTambah">
-                            <i class="fas fa-user-plus me-2"></i>Tambah Pelanggan
-                        </button>
+            <!-- Search & Tombol Tambah -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <form method="GET" action="" class="d-flex gap-2">
+                                <div class="input-group flex-grow-1">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari nama, email, atau no. telepon..." value="<?php echo htmlspecialchars($search); ?>">
+                                </div>
+                                <button type="submit" class="btn btn-maroon"><i class="fas fa-search"></i></button>
+                                <?php if($search): ?>
+                                    <a href="pelanggan.php" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <button class="btn btn-maroon" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                                <i class="fas fa-user-plus me-2"></i>Tambah Pelanggan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tabel Pelanggan -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="ps-4" style="width: 30%;">PELANGGAN</th>
-                                <th style="width: 20%;">EMAIL</th>
-                                <th style="width: 15%;">NO. TELEPON</th>
-                                <th style="width: 20%;">ALAMAT</th>
-                                <th class="text-center" style="width: 10%;">TERDAFTAR</th>
-                                <th class="text-center" style="width: 10%;">AKSI</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if($result && mysqli_num_rows($result) > 0): ?>
-                                <?php while($row = mysqli_fetch_assoc($result)): 
-                                    // Ambil inisial nama untuk avatar
-                                    $nama_parts = explode(' ', $row['nama_lengkap']);
-                                    $inisial = strtoupper(substr($nama_parts[0], 0, 1) . (isset($nama_parts[1]) ? substr($nama_parts[1], 0, 1) : ''));
-                                ?>
+            <!-- Tabel Pelanggan -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
                                 <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="customer-avatar">
-                                                <?php echo $inisial; ?>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-dark"><?php echo htmlspecialchars($row['nama_lengkap']); ?></div>
-                                                <small class="text-muted">ID: #<?php echo str_pad($row['id'], 4, '0', STR_PAD_LEFT); ?></small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div><i class="fas fa-envelope text-muted me-1"></i><?php echo htmlspecialchars($row['email']); ?></div>
-                                    </td>
-                                    <td>
-                                        <div><i class="fas fa-phone text-muted me-1"></i><?php echo htmlspecialchars($row['no_telepon'] ?? '-'); ?></div>
-                                    </td>
-                                    <td>
-                                        <small class="text-muted"><?php echo htmlspecialchars(substr($row['alamat'] ?? '-', 0, 40)) . (strlen($row['alamat'] ?? '') > 40 ? '...' : ''); ?></small>
-                                    </td>
-                                    <td class="text-center">
-                                        <small class="text-muted"><?php echo date('d M Y', strtotime($row['created_at'])); ?></small>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="pelanggan.php?edit=<?php echo $row['id']; ?>" class="btn btn-sm btn-light text-primary me-1 border" title="Edit">
-                                            <i class="fas fa-pen-to-square"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-light text-danger border" 
-                                                onclick="confirmHapus(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['nama_lengkap']); ?>')" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    <th class="ps-4" style="width: 30%;">PELANGGAN</th>
+                                    <th style="width: 20%;">EMAIL</th>
+                                    <th style="width: 15%;">NO. TELEPON</th>
+                                    <th style="width: 20%;">ALAMAT</th>
+                                    <th class="text-center" style="width: 10%;">TERDAFTAR</th>
+                                    <th class="text-center" style="width: 10%;">AKSI</th>
                                 </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="6" class="text-center py-5">
-                                        <i class="fas fa-users-slash text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
-                                        <p class="text-muted mb-0">Tidak ada pelanggan ditemukan.</p>
-                                        <?php if($search): ?>
-                                            <small class="text-muted">Coba kata kunci pencarian lain</small>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php if($result && mysqli_num_rows($result) > 0): ?>
+                                    <?php while($row = mysqli_fetch_assoc($result)): 
+                                        // Ambil inisial nama untuk avatar
+                                        $nama_parts = explode(' ', $row['nama_lengkap']);
+                                        $inisial = strtoupper(substr($nama_parts[0], 0, 1) . (isset($nama_parts[1]) ? substr($nama_parts[1], 0, 1) : ''));
+                                    ?>
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="customer-avatar">
+                                                    <?php echo $inisial; ?>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark"><?php echo htmlspecialchars($row['nama_lengkap']); ?></div>
+                                                    <small class="text-muted">ID: #<?php echo str_pad($row['id'], 4, '0', STR_PAD_LEFT); ?></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div><i class="fas fa-envelope text-muted me-1"></i><?php echo htmlspecialchars($row['email']); ?></div>
+                                        </td>
+                                        <td>
+                                            <div><i class="fas fa-phone text-muted me-1"></i><?php echo htmlspecialchars($row['no_telepon'] ?? '-'); ?></div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted"><?php echo htmlspecialchars(substr($row['alamat'] ?? '-', 0, 40)) . (strlen($row['alamat'] ?? '') > 40 ? '...' : ''); ?></small>
+                                        </td>
+                                        <td class="text-center">
+                                            <small class="text-muted"><?php echo date('d M Y', strtotime($row['created_at'])); ?></small>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="pelanggan.php?edit=<?php echo $row['id']; ?>" class="btn btn-sm btn-light text-primary me-1 border" title="Edit">
+                                                <i class="fas fa-pen-to-square"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-light text-danger border" 
+                                                    onclick="confirmHapus(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['nama_lengkap']); ?>')" title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="fas fa-users-slash text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                            <p class="text-muted mb-0">Tidak ada pelanggan ditemukan.</p>
+                                            <?php if($search): ?>
+                                                <small class="text-muted">Coba kata kunci pencarian lain</small>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Content Wrapper -->
+
+    <!-- ========================================== -->
+    <!-- BAGIAN MODAL                               -->
+    <!-- ========================================== -->
 
     <!-- MODAL TAMBAH PELANGGAN -->
     <div class="modal fade" id="modalTambah" tabindex="-1">
@@ -365,6 +403,9 @@ $total_count = mysqli_fetch_assoc($total_pelanggan)['total'];
                         <div class="mb-3">
                             <label class="form-label fw-semibold small text-muted">ALAMAT</label>
                             <textarea name="alamat" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="alert alert-info small mb-0">
+                            <i class="fas fa-info-circle me-1"></i> Password default untuk pelanggan baru adalah <strong>123456</strong>.
                         </div>
                     </div>
                     <div class="modal-footer border-top">

@@ -1,5 +1,6 @@
 <?php 
 session_start(); // Pastikan session dimulai (jika belum ada di header.php/koneksi.php)
+// require_once 'include/auth_user.php';
 require_once 'config/koneksi.php';
 include 'includes/header.php'; 
 

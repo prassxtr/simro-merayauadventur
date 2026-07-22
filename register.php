@@ -1,8 +1,14 @@
 <?php 
+session_start();
 require_once 'config/koneksi.php';
 
+// Jika sudah login, redirect agar tidak bisa buka halaman register lagi
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    if ($_SESSION['role'] == 'admin') {
+        header('Location: admin/index.php');
+    } else {
+        header('Location: index.php');
+    }
     exit;
 }
 
@@ -32,7 +38,7 @@ if (isset($_POST['register'])) {
                       VALUES ('$nama', '$email', '$telepon', '$alamat', '$password_hash', 'customer')";
             
             if (mysqli_query($koneksi, $query)) {
-                $success = 'Registrasi berhasil! Silakan login.';
+                // Redirect ke login dengan pesan sukses
                 header('Location: login.php?registered=1');
                 exit;
             } else {
@@ -41,13 +47,18 @@ if (isset($_POST['register'])) {
         }
     }
 }
+
+// Tangkap pesan jika datang dari redirect registrasi berhasil
+if (isset($_GET['registered']) && $_GET['registered'] == '1') {
+    $success = 'Registrasi berhasil! Silakan login dengan akun Anda.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi - SIMRO Merayau Adventur</title>
+    <title>Registrasi - SIMRO Merayau Adventure</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>

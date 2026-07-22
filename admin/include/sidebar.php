@@ -100,7 +100,7 @@
         <!-- Daftar Menu -->
         <ul class="nav nav-pills flex-column nav-custom mb-4">
             <li class="nav-item">
-                <a href="katalog.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'katalog.php') ? 'active' : ''; ?>">
+                <a href="index.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-layer-group"></i> 
                     <span>Kelola Katalog</span>
                 </a>
@@ -112,7 +112,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="pengembalian.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'pengembalian.php' || basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">
+                <a href="pengembalian.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'pengembalian.php' || basename($_SERVER['PHP_SELF']) == 'pengembalian.php') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-clipboard-check"></i> 
                     <span>Kelola Pengembalian</span>
                 </a>
@@ -135,9 +135,12 @@
     <!-- Bagian Tombol Logout Paling Bawah -->
     <div class="logout-section mt-auto">
         <hr class="custom-hr-bottom">
-        <a href="logout.php" class="logout-link">
+        
+        <!-- Tambahkan onclick="return confirm(...)" untuk mencegah logout tidak sengaja -->
+        <a href="logout.php" class="logout-link" onclick="return confirm('Apakah Anda yakin ingin keluar dari sistem?')">
             <i class="fa-solid fa-right-from-bracket"></i> 
             <span>Logout</span>
         </a>
     </div>
+</div> 
 </div> 

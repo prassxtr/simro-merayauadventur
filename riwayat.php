@@ -1,5 +1,5 @@
 <?php 
-include 'includes/header.php'; 
+require_once 'config/koneksi.php';
 
 // Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {

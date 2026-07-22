@@ -1,38 +1,64 @@
 <?php 
+session_start();
 require_once 'config/koneksi.php';
 
+// 1. Jika sudah login, redirect sesuai role (Cegah akses halaman login jika sudah login)
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    if ($_SESSION['role'] == 'admin') {
+        header('Location: admin/index.php'); // Atau admin/index.php sesuai struktur Anda
+    } else {
+        header('Location: index.php');
+    }
     exit;
 }
 
+// 2. Inisialisasi variabel pesan
 $error = '';
+$success = '';
 
+// 3. Tangkap pesan dari URL (Logout atau Timeout)
+if (isset($_GET['logout']) && $_GET['logout'] == '1') {
+    $success = 'Anda telah berhasil keluar dari sistem.';
+}
+
+if (isset($_GET['timeout']) && $_GET['timeout'] == '1') {
+    $error = 'Sesi Anda telah berakhir karena tidak aktif. Silakan login kembali.';
+}
+
+// 4. Proses Login
 if (isset($_POST['login'])) {
     $email = mysqli_real_escape_string($koneksi, $_POST['email']);
     $password = $_POST['password'];
     
-    $query = mysqli_query($koneksi, "SELECT * FROM users WHERE email = '$email'");
-    
-    if (mysqli_num_rows($query) > 0) {
-        $user = mysqli_fetch_assoc($query);
-        
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['nama'] = $user['nama_lengkap'];
-            $_SESSION['role'] = $user['role'];
-            
-            if ($user['role'] == 'admin') {
-                header('Location: admin/dashboard.php');
-            } else {
-                header('Location: index.php');
-            }
-            exit;
-        } else {
-            $error = 'Password salah!';
-        }
+    if (empty($email) || empty($password)) {
+        $error = 'Email dan password harus diisi!';
     } else {
-        $error = 'Email tidak terdaftar!';
+        $query = mysqli_query($koneksi, "SELECT * FROM users WHERE email = '$email'");
+        
+        if (mysqli_num_rows($query) > 0) {
+            $user = mysqli_fetch_assoc($query);
+            
+            if (password_verify($password, $user['password'])) {
+                // Set session
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['nama'] = $user['nama_lengkap'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['last_activity'] = time();
+                
+                // Redirect berdasarkan role
+                if ($user['role'] == 'admin') {
+                    header('Location: admin/index.php');
+                } else {
+                    header('Location: index.php');
+                }
+                exit;
+            } else {
+                $error = 'Password salah!';
+            }
+        } else {
+            $error = 'Email tidak terdaftar!';
+        }
     }
 }
 ?>
@@ -41,7 +67,7 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIMRO Merayau Adventur</title>
+    <title>Login - SIMRO Merayau Adventure</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -200,6 +226,15 @@ if (isset($_POST['login'])) {
             margin-bottom: 20px;
         }
         
+        .alert-success {
+            background-color: #f0fff4;
+            border-color: #c6f6d5;
+            color: #276749;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .login-image {
                 display: none;
@@ -225,7 +260,7 @@ if (isset($_POST['login'])) {
                 <div class="login-image">
                     <div>
                         <h2>Siap Untuk Petualang?</h2>
-                        <p>Masuk untuk melihat Status penyewaan alat outdoor anda</p>
+                        <p>Masuk untuk melihat status penyewaan alat outdoor Anda</p>
                     </div>
                 </div>
             </div>
@@ -236,16 +271,24 @@ if (isset($_POST['login'])) {
                     <h3>Selamat Datang</h3>
                     <p class="text-muted mb-4">Silakan masuk untuk melakukan penyewaan alat outdoor Anda.</p>
                     
+                    <!-- Tampilkan Pesan Error -->
                     <?php if($error): ?>
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i><?= $error ?>
                         </div>
                     <?php endif; ?>
                     
+                    <!-- Tampilkan Pesan Sukses (Logout) -->
+                    <?php if($success): ?>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i><?= $success ?>
+                        </div>
+                    <?php endif; ?>
+                    
                     <form method="POST">
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="masukan email anda" required>
+                            <input type="email" name="email" class="form-control" placeholder="Masukan email anda" required>
                         </div>
                         
                         <div class="mb-4">
@@ -253,7 +296,7 @@ if (isset($_POST['login'])) {
                                 <label class="form-label fw-semibold">Password</label>
                                 <a href="#" class="forgot-password">Lupa Password?</a>
                             </div>
-                            <input type="password" name="password" class="form-control" placeholder="masukan Password anda" required>
+                            <input type="password" name="password" class="form-control" placeholder="Masukan password anda" required>
                         </div>
                         
                         <button type="submit" name="login" class="btn btn-login w-100 text-white">
