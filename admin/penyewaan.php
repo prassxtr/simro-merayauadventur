@@ -2,10 +2,9 @@
 require_once 'include/auth_check.php';
 require_once '../config/koneksi.php';
 
-$conn = $koneksi;
-if (!$conn) {
-    die("Koneksi Database Gagal: " . mysqli_connect_error());
-}
+$conn = isset($koneksi) ? $koneksi : die("Koneksi database gagal.");
+$search = '';
+$filter_status = '';
 
 // ==========================================
 // 1. PROSES AKSI: TAMBAH PENYEWAAN BARU (KASIR)
@@ -155,7 +154,7 @@ $page_title = "Kelola Penyewaan";
         <!-- 4. MAIN CONTENT -->
         <div class="main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold m-0 d-inline text-white">Daftar Transaksi</h4>
+                <h4 class="fw-bold m-0 d-inline text-dark">Daftar Transaksi</h4>
                 <button type="button" class="btn btn-brand btn-sm px-3 py-2 shadow-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalKasirSewa">
                     <i class="fa-solid fa-cart-plus me-1"></i> Buat Sewa Baru
                 </button>
